@@ -9,7 +9,7 @@ web:
   environment:
     DEBUG: 'true'
   env_file: .env
-  command: /usr/local/bin/gunicorn mind_rate_server.wsgi:application -w 2 -b :8000
+  command: /usr/local/bin/gunicorn mind_rate_server.wsgi:application -w 2 -b :8000  --reload
 
 nginx:
   restart: always
