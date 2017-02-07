@@ -11,7 +11,7 @@
 
 ## Migrate Database
 
-Everytime after the models are modified, a manual migrationg of the database is required in order to see the changes in web app.
+Everytime after the models are modified, a manual migration of the database is required in order to apply the changes to the database.
 
 1. Display all docker running containers : `$ docker ps`
 2. Get the **CONTAINER ID** of the `mindrateserverdocker_web` container, e.g. `7fac64c6cf8a`
