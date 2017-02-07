@@ -8,3 +8,13 @@
 6. `$ docker-compose up -d`
 7. Get the IP address of the Docker virtual machine: `$ docker-machine ip dev`
 8. Go to that IP in browser
+
+## Migrate Database
+
+Everytime after the models are modified, a manual migrationg of the database is required in order to see the changes in web app.
+
+1. Display all docker running containers : `$ docker ps`
+2. Get the **CONTAINER ID** of the `mindrateserverdocker_web` container, e.g. `7fac64c6cf8a`
+3. Log into the running container: `$ docker exec -t -i 7fac64c6cf8a bash`
+4. `$ cd /usr/src/app`
+5. `$ python manage.py migrate`
