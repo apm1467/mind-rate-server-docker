@@ -87,3 +87,5 @@ ENV/
 
 # macOS
 .DS_Store
+/web/db.sqlite3
+/.idea
