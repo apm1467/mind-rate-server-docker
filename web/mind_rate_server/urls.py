@@ -15,8 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import UserCreationForm
+from mind_rate_server.survey.forms import LoginForm
 
 urlpatterns = [
-    url(r'^survey/', include('survey.urls')),
+    url(r'', include('mind_rate_server.survey.urls')),
+
     url(r'^admin/', admin.site.urls),
+
+    url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html',
+                                        'authentication_form': LoginForm}, name='login'),
+
+    url(r'^logout/$', auth_views.logout, {'next_page': '/login'}, name='logout'),
+
 ]
