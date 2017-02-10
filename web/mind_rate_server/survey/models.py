@@ -25,18 +25,18 @@ class StudyDirector(models.Model):
 	appellation = models.CharField("Appellation", max_length=2, choices=APPELLATION_CHOICES)
 
 	'''
-	The two underscores are to define attribute "passwort" as private
+	The two underscores are to define attribute "password" as private
 	'''
-	__passwort = models.CharField("Passwort", max_length=20)
+	__password = models.CharField("Password", max_length=20)
 
 	'''
-	To check whether the account exists and the passwort is valid
-	If the passwort is valid, this method will return true; otherwise false
+	To check whether the account exists and the password is valid
+	If the password is valid, this method will return true; otherwise false
 	'''
-	def signIn(self, sign_in_mail_address, passwort):
+	def signIn(self, sign_in_mail_address, password):
 		try:
 			existingAccount = StudyDirector.objects.get(mail_address = sign_in_mail_address)
-			if passwort == existingAccount.passwort：
+			if password == existingAccount.password:
 				return true
 			else：
 				return false
@@ -44,18 +44,18 @@ class StudyDirector(models.Model):
 			print "%s has not yet registered. You should sign up first." % sign_in_mail_address
 
 	'''
-	To get the private attribute __passwort outside this class
+	To get the private attribute __password outside this class
 	'''
 	@property
-	def passwort(self):
-		return self.__passwort
+	def password(self):
+		return self.__password
 
 	'''
-	To reset the passwort
+	To reset the password
 	'''
-	@passwort.setter
-	def passwort(self, new_passwort):
-		self.__passwort = new_passwort
+	@password.setter
+	def password(self, new_password):
+		self.__password = new_password
 
 class Study(models.Model):
 	study_director_id = models.ForeignKey("Study Director", StudyDirector, on_delete=models.CASCADE)
