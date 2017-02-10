@@ -16,15 +16,18 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.forms import UserCreationForm
 from mind_rate_server.survey.forms import LoginForm
+from registration.views import RegistrationView
+
 
 urlpatterns = [
     url(r'', include('mind_rate_server.survey.urls')),
 
     url(r'^admin/', admin.site.urls),
 
-    url(r'^accounts/', include('registration.backends.simple.urls')),
+    # url(r'', include('registration.backends.simple.urls')),
+
+    url(r'^register/$', RegistrationView.as_view(), name='registration_register'),
 
     # url(r'^signup/$', auth_views.login, {'template_name': 'registration/signup.html',
     #                                     'authentication_form': UserCreationForm}, name='signup'),
