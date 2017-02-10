@@ -24,6 +24,11 @@ urlpatterns = [
 
     url(r'^admin/', admin.site.urls),
 
+    url(r'^accounts/', include('registration.backends.simple.urls')),
+
+    # url(r'^signup/$', auth_views.login, {'template_name': 'registration/signup.html',
+    #                                     'authentication_form': UserCreationForm}, name='signup'),
+
     url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html',
                                         'authentication_form': LoginForm}, name='login'),
 

@@ -1,0 +1,67 @@
+{% extends '_base.html' %}
+
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Please Sign Up</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <form method="post" action="/accounts/register/">
+                            {% csrf_token %}
+
+                            <p class="bs-component">
+                                <table>
+                                    <tr>
+                                        <td>User Name: </td>
+                                        <td>{{ form.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email: </td>
+                                        <td>{{ form.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Password: </td>
+                                        <td>{{ form.password1 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Password again: </td>
+                                        <td>{{ form.password2 }}</td>
+                                    </tr>
+                                </table>
+                            </p>
+                            <p class="bs-component">
+                                <center>
+                                    <input class="btn btn-success btn-sm" type="submit" value="Sign Up" />
+                                </center>
+                            </p>
+                            <input type="hidden" name="next" value="{{ next }}" />
+                        </form>
+
+                        {% if form.errors %}
+                            <h4>Form Errors:</h4>
+                            {{ form.errors }}
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script>
+        {% if not user.is_authenticated %}
+            $("ul.nav.navbar-nav.navbar-right").css("display","none");
+        {% endif %}
+    </script>
+
+{% endblock %}
