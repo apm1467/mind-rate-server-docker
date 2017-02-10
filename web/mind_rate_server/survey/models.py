@@ -18,7 +18,7 @@ class StudyDirector(models.Model):
 	To check whether the mail address is validated
 	An unvalid mail address will cause ValidationError
 	'''
-	mail_address = models.EmailField("Email-Address", max_length=50, primary_key=true)
+	mail_address = models.EmailField("Email-Address", max_length=50, primary_key=True)
 	first_name = models.CharField("First Name", max_length=30)
 	last_name = models.CharField("Last Name", max_length=30)
 	titel = models.CharField("Titel", max_length=20)
@@ -31,15 +31,15 @@ class StudyDirector(models.Model):
 
 	'''
 	To check whether the account exists and the password is valid
-	If the password is valid, this method will return true; otherwise false
+	If the password is valid, this method will return True; otherwise False
 	'''
 	def signIn(self, sign_in_mail_address, password):
 		try:
 			existingAccount = StudyDirector.objects.get(mail_address = sign_in_mail_address)
 			if password == existingAccount.password:
-				return true
-			else：
-				return false
+				return True
+			else:
+				return False
 		except DoesNotExist:
 			print "%s has not yet registered. You should sign up first." % sign_in_mail_address
 
@@ -74,14 +74,14 @@ class Study(models.Model):
 			
 	'''
 	This method is to find out whether there is a duplicate of the study name in the studies of the same study director
-	This method will return true if NO duplicate is found; otherwise false
+	This method will return True if NO duplicate is found; otherwise False
 	'''
 	def findDuplicateName(self):
 		try:
 			Study.objects.get(study_director_id = self.study_director_id, study_name = self.study_name)
 		except DoesNotExist:
-			return true
-		return false
+			return True
+		return False
 
 '''
 This class takes a serial integer as primary key
@@ -103,14 +103,14 @@ class Questionnaire(models.Model):
 			
 	'''
 	The method is to find out whether there is a duplicate of the questionnaire name in the same studies of the same study director
-	This method will return true if NO duplicate is found; otherwise false
+	This method will return True if NO duplicate is found; otherwise False
 	'''
 	def findDuplicateName(self):
 		try:
 			Study.objects.get(study_director_id = self.study_director_id, study_name = self.study_name, questionnaire_name = self.questionnaire_name)
 		except DoesNotExist:
-			return true
-		return false
+			return True
+		return False
 
 	'''
 	This method will take a dictionary as parameter and set the trigger events of the questionnaire accordingly
