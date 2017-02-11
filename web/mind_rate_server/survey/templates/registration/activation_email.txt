@@ -1,0 +1,11 @@
+Hello {{ user }},
+
+thank you for signing up. This is your activation key:
+
+http://{{ site.domain }}/accounts/activate/{{ activation_key }}
+
+Please activate your account within {{ expiration_days }} days.
+
+Best wishes
+
+Mind Rate Team

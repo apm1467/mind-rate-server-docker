@@ -27,7 +27,7 @@ urlpatterns = [
 
     # url(r'', include('registration.backends.simple.urls')),
 
-    url(r'^register/$', RegistrationView.as_view(), name='registration_register'),
+    # url(r'^register/$', RegistrationView.as_view(), name='registration_register'),
 
     # url(r'^signup/$', auth_views.login, {'template_name': 'registration/signup.html',
     #                                     'authentication_form': UserCreationForm}, name='signup'),
@@ -37,4 +37,5 @@ urlpatterns = [
 
     url(r'^logout/$', auth_views.logout, {'next_page': '/login'}, name='logout'),
 
+    url(r'^accounts/', include('registration.backends.hmac.urls')),
 ]

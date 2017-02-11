@@ -1,0 +1,22 @@
+{% extends 'registration/_base_registration.html' %}
+
+
+{% block registration_content %}
+
+    <div class="panel-heading">
+        <h3 class="panel-title">Account Activation Fails</h3>
+    </div>
+
+    <div class="panel-body">
+
+        <p>{{ activation_key }}</p>
+        <p>This is not a valid activation key.</p>
+
+    </div>
+
+
+    {% if not user.is_authenticated %}
+        <p>You can also <a href="{% url 'registration_register' %}">register</a> again.</p>
+    {% endif %}
+
+{% endblock %}
