@@ -24,14 +24,10 @@ from mind_rate_server.survey import views
 urlpatterns = [
     url(r'', include('mind_rate_server.survey.urls')),
 
+    # redirect admin logout page
+    url(r'^admin/logout/', auth_views.logout, {'next_page': '/login'}, name='logout'),
+
     url(r'^admin/', admin.site.urls),
-
-    # url(r'', include('registration.backends.simple.urls')),
-
-    # url(r'^register/$', RegistrationView.as_view(), name='registration_register'),
-
-    # url(r'^signup/$', auth_views.login, {'template_name': 'registration/signup.html',
-    #                                     'authentication_form': UserCreationForm}, name='signup'),
 
     url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html',
                                         'authentication_form': LoginForm}, name='login'),
