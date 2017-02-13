@@ -9,13 +9,13 @@ class StudyDirector(models.Model):
     To check whether the mail address is validated
     An unvalid mail address will cause ValidationError
     '''
-    mail_address = models.EmailField("Email-Address", max_length=50, primary_key=True, blank=True, default="haha@gmail.com")
-    titel = models.CharField("Titel", max_length=20, blank=True)
+    mail_address = models.EmailField("Email-Address", max_length=50, primary_key=True)
+    titel = models.CharField("Titel", max_length=20)
 
     '''
-    The two underscores are to define attribute "passwort" as private
+    The one underscores are to define attribute "passwort" as private
     '''
-    _passwort = models.CharField("Passwort", max_length=20, blank=True)
+    _passwort = models.CharField("Passwort", max_length=20)
 
     '''
     To check whether the account exists and the passwort is valid
@@ -43,10 +43,10 @@ class StudyDirector(models.Model):
 
 
 class Study(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True, blank=True, default="haha@gmail.com")
-    study_name = models.CharField("Study Name", max_length=30, blank=True)
-    start_date_time = models.DateTimeField("Start Date and Time", blank=True)
-    end_date_time = models.DateTimeField("End Date and Time", blank=True)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
+    study_name = models.CharField("Study Name", max_length=30)
+    start_date_time = models.DateTimeField("Start Date and Time")
+    end_date_time = models.DateTimeField("End Date and Time")
 
     '''
     This method has overriden the original save method
@@ -80,11 +80,11 @@ This class takes a serial integer as primary key
 
 
 class Questionnaire(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, blank=True, null=True)
-    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
-    questionnaire_name = models.CharField("Questionnaire Name", max_length=30, blank=True)
-    required_submit_date_time = models.DateTimeField("Deadline Date and Time", null=True, blank=True)
-    max_show_up_times_per_day = models.IntegerField(null=True)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
+    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
+    questionnaire_name = models.CharField("Questionnaire Name", max_length=30)
+    required_submit_date_time = models.DateTimeField("Deadline Date and Time", null=True)
+    max_show_up_times_per_day = models.IntegerField("Max Show Up Times Per Day", null=True)
 
     '''
     This method has overriden the original save method
@@ -137,9 +137,9 @@ class TriggerEvent(models.Model):
         ('Mag', 'Magnetic Field'),
         ('Prox', 'Proximity'),
     )
-    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, blank=True)
-    name = models.CharField("Trigger Event Name", max_length=10, choices=TRIGGER_EVENT_CHOICES, blank=True)
-    value = models.CharField("Value", max_length=30, blank=True)
+    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True)
+    name = models.CharField("Trigger Event Name", max_length=10, choices=TRIGGER_EVENT_CHOICES)
+    value = models.CharField("Value", max_length=50)
 
 
 '''
@@ -149,11 +149,11 @@ It contains the common attributes study_director_id, study_id, questionnaire_id,
 
 
 class CommonQuestion(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True, blank=True)
-    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
-    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True, blank=True)
-    question_type = models.CharField("Question Type", max_length=30, blank=True)
-    question_content = models.TextField("Question Content", blank=True)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
+    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
+    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True)
+    question_type = models.CharField("Question Type", max_length=30)
+    question_content = models.TextField("Question Content")
 
     class Meta:
         abstract = True
@@ -168,41 +168,41 @@ class ChoiceQuestion(CommonQuestion):
     """
     To stored the options, different options will be separated by semicolon
     """
-    option = models.TextField("Option", blank=True)
+    option = models.TextField("Option")
 
 
 class ScaleQuestion(CommonQuestion):
-    min_value = models.FloatField("Minimum", blank=True)
-    max_value = models.FloatField("Maximum", blank=True)
-    gap_value = models.FloatField("Gap", blank=True)
+    min_value = models.FloatField("Minimum")
+    max_value = models.FloatField("Maximum")
+    gap_value = models.FloatField("Gap")
 
 
 class Answer(models.Model):
-    proband_id = models.ForeignKey('Proband', null=True, blank=True)
-    submit_date_time = models.DateTimeField("Submit Date and Time", null=True, blank=True)
-    question_id = models.IntegerField('Question', null=True, blank=True)
-    question_type = models.CharField("Question Type", max_length=30, blank=True)
+    proband_id = models.ForeignKey('Proband', null=True)
+    submit_date_time = models.DateTimeField("Submit Date and Time", null=True)
+    question_id = models.IntegerField("Question ID", null=True)
+    question_type = models.CharField("Question Type", max_length=30)
     text_value = models.TextField("Answer of Text Question", blank=True)
-    choice_value = models.CharField("Answer of Choice Question", max_length=30, blank=True)
-    integer_value = models.FloatField("Answer of Scale Question", blank=True)
+    choice_value = models.CharField("Answer of Choice Question", max_length=30)
+    integer_value = models.FloatField("Answer of Scale Question")
 
     def __str__(self):
         return self.text_value
 
 
 class Proband(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True, blank=True)
-    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
+    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
 
 
 class NotAnsweredQuestionnaire(models.Model):
     # This attribute represents the proband ID
-    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE, null=True, blank=True)
-    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True, blank=True)
+    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE, null=True)
+    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True)
 
 
 class PersonalInformation(models.Model):
-    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE, null=True, blank=True)
-    personal_information_name = models.CharField(max_length=30, blank=True)
-    string_value = models.CharField(max_length=30, blank=True)
-    integer_value = models.IntegerField(blank=True)
+    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE, null=True)
+    personal_information_name = models.CharField(max_length=30)
+    string_value = models.CharField(max_length=30)
+    integer_value = models.IntegerField()
