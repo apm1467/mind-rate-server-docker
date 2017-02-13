@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from mind_rate_server.survey.forms import LoginForm
 from registration.views import RegistrationView
+from mind_rate_server.survey import views
 
 
 urlpatterns = [
@@ -38,4 +39,6 @@ urlpatterns = [
     url(r'^logout/$', auth_views.logout, {'next_page': '/login'}, name='logout'),
 
     url(r'^accounts/', include('registration.backends.hmac.urls')),
+
+    url(r'^study/(?P<study_id>\d+)/$', views.view_answers, name='view_answers'),
 ]
