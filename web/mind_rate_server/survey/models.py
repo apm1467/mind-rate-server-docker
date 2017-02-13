@@ -177,7 +177,7 @@ class Answer(models.Model):
     questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True, blank=True)
     question_id = models.IntegerField('Question', null=True, blank=True)
     proband_id = models.IntegerField(blank=True)
-    submit_date_time = models.DateTimeField("Submit Date and Time", blank=True)
+    submit_date_time = models.DateTimeField("Submit Date and Time", null=True, blank=True)
     question_type = models.CharField("Question Type", max_length=30, blank=True)
     text_value = models.TextField("Answer of Text Question", blank=True)
     choice_value = models.CharField("Answer of Choice Question", max_length=30, blank=True)
