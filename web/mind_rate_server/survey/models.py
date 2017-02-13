@@ -175,7 +175,7 @@ class Answer(models.Model):
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True, blank=True)
     study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
     questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True, blank=True)
-    question_id = models.IntegerField('Question')
+    question_id = models.IntegerField('Question', null=True, blank=True)
     proband_id = models.IntegerField(blank=True)
     submit_date_time = models.DateTimeField("Submit Date and Time", blank=True)
     question_type = models.CharField("Question Type", max_length=30, blank=True)
