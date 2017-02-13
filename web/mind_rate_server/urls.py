@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from mind_rate_server.survey.forms import LoginForm
 from registration.views import RegistrationView
-from survey import views
+from mind_rate_server.survey import views
 
 
 urlpatterns = [
