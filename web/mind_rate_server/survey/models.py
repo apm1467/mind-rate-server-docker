@@ -42,7 +42,7 @@ class StudyDirector(models.Model):
 
 
 class Study(models.Model):
-    study_director_id = models.ForeignKey("Study Director", StudyDirector, on_delete=models.CASCADE)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE)
     study_name = models.CharField("Study Name", max_length=30)
     start_date_time = models.DateTimeField("Start Date and Time")
     end_date_time = models.DateTimeField("End Date and Time")
@@ -76,8 +76,8 @@ This class takes a serial integer as primary key
 
 
 class Questionnaire(models.Model):
-    study_director_id = models.ForeignKey("Study Director", StudyDirector, on_delete=models.CASCADE)
-    study_id = models.ForeignKey("Study", Study, on_delete=models.CASCADE)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE)
+    study_id = models.ForeignKey('Study', on_delete=models.CASCADE)
     questionnaire_name = models.CharField("Questionnaire Name", max_length=30)
     deadline_date_time = models.DateTimeField("Deadline Date and Time")
 
@@ -129,7 +129,7 @@ class TriggerEvent(models.Model):
         ('Mag', 'Magnetic Field'),
         ('Prox', 'Proximity'),
     )
-    questionnaire_id = models.ForeignKey("Belongs to Questionnaire No.", Questionnaire, on_delete=models.CASCADE)
+    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE)
     name = models.CharField("Trigger Event Name", max_length=10, choices=TRIGGER_EVENT_CHOICES)
     value = models.CharField("Value", max_length=30)
 
@@ -141,9 +141,9 @@ It contains the common attributes study_director_id, study_id, questionnaire_id,
 
 
 class CommonQuestion(models.Model):
-    study_director_id = models.ForeignKey("Study Director ID", StudyDirector, on_delete=models.CASCADE)
-    study_id = models.ForeignKey("Study ID", Study, on_delete=models.CASCADE)
-    questionnaire_id = models.ForeignKey("Questionnaire ID", Questionnaire, on_delete=models.CASCADE)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE)
+    study_id = models.ForeignKey('Study', on_delete=models.CASCADE)
+    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE)
     question_type = models.CharField("Question Type", max_length=30)
     question_content = models.TextField("Question Content")
 
@@ -170,11 +170,11 @@ class ScaleQuestion(CommonQuestion):
 
 
 class Answer(models.Model):
-    study_director_id = models.ForeignKey("Study Director ID", StudyDirector, on_delete=models.CASCADE)
-    study_id = models.ForeignKey("Study ID", Study, on_delete=models.CASCADE)
-    questionnaire_id = models.ForeignKey("Questionnaire ID", Questionnaire, on_delete=models.CASCADE)
-    question_id = models.ForeignKey("Question", CommonQuestion, on_delete=models.CASCADE)
-    proband_id = models.ForeignKey("Proband", Proband, on_delete=models.CASCADE)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE)
+    study_id = models.ForeignKey('Study', on_delete=models.CASCADE)
+    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE)
+    # question_id = models.ForeignKey('Question', on_delete=models.CASCADE)
+    proband_id = models.IntegerField()
     hand_up_date_time = models.DateTimeField("Hand Up Date and Time")
     question_type = models.CharField("Question Type", max_length=30)
     text_value = models.TextField("Answer of Text Question")
@@ -183,18 +183,18 @@ class Answer(models.Model):
 
 
 class Proband(models.Model):
-    study_director_id = models.ForeignKey("Study Director ID", StudyDirector, on_delete=models.CASCADE)
-    study_id = models.ForeignKey("Study ID", Study, on_delete=models.CASCADE)
+    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE)
+    study_id = models.ForeignKey('Study', on_delete=models.CASCADE)
 
 
 class NotAnsweredQuestionnaire(models.Model):
     # This attribute represents the proband ID
-    proband_id = models.ForeignKey("Belongs to Proband No.", Proband, on_delete=models.CASCADE)
-    questionnaire_id = models.ForeignKey("Questionnaire ID", Questionnaire, on_delete=models.CASCADE)
+    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE)
+    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE)
 
 
 class PersonalInformation(models.Model):
-    proband_id = models.ForeignKey("Belongs to Proband No.", Proband, on_delete=models.CASCADE)
+    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE)
     personal_information_name = models.CharField(max_length=30)
     string_value = models.CharField(max_length=30)
     integer_value = models.IntegerField()
