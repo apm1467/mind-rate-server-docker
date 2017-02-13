@@ -57,7 +57,7 @@ class Study(models.Model):
 
     def save(self, *args, **kwargs):
         if self.find_duplicate_name():
-            super().save()
+            super().save(*args, **kwargs)
 
     '''
     This method is to find out whether there is a duplicate of the study name in the studies of the same study director
@@ -91,7 +91,7 @@ class Questionnaire(models.Model):
 
     def save(self, *args, **kwargs):
         if self.find_duplicate_name():
-            super().save()
+            super().save(*args, **kwargs)
 
     '''
     The method is to find out whether there is a duplicate of the questionnaire name in the same studies of the same study director
