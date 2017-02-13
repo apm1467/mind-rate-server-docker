@@ -4,10 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 '''
 CAUTION: when initializing an instance of this class, be sure to catch the IntegrityError, which is caused by a duplicate of primary key "mail_address" in table StudyDirector
 '''
-
-#TODO Set all all the  attribute to blank=True. After test they should be modified accordingly
-#TODO Set StudyDirector.mail_address  "default=haha@gmail.com"
-
 class StudyDirector(models.Model):
     '''
     To check whether the mail address is validated
@@ -42,6 +38,9 @@ class StudyDirector(models.Model):
     def passwort(self, new_passwort):
         self._passwort = new_passwort
 
+    def __str__(self):
+        return self.mail_address
+
 
 class Study(models.Model):
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True, blank=True, default="haha@gmail.com")
@@ -57,7 +56,7 @@ class Study(models.Model):
 
     def save(self, *args, **kwargs):
         if self.find_duplicate_name():
-            super().save(*args, **kwargs)
+            super(Study, self).save(*args, **kwargs)
 
     '''
     This method is to find out whether there is a duplicate of the study name in the studies of the same study director
@@ -71,6 +70,9 @@ class Study(models.Model):
             return True
         return False
 
+    def __str__(self):
+        return self.study_name
+
 
 '''
 This class takes a serial integer as primary key
@@ -81,7 +83,8 @@ class Questionnaire(models.Model):
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, blank=True, null=True)
     study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
     questionnaire_name = models.CharField("Questionnaire Name", max_length=30, blank=True)
-    submit_date_time = models.DateTimeField("Deadline Date and Time", null=True, blank=True)
+    required_submit_date_time = models.DateTimeField("Deadline Date and Time", null=True, blank=True)
+    max_show_up_times_per_day = models.IntegerField(null=True)
 
     '''
     This method has overriden the original save method
@@ -91,7 +94,7 @@ class Questionnaire(models.Model):
 
     def save(self, *args, **kwargs):
         if self.find_duplicate_name():
-            super().save(*args, **kwargs)
+            super(Questionnaire, self).save(*args, **kwargs)
 
     '''
     The method is to find out whether there is a duplicate of the questionnaire name in the same studies of the same study director
@@ -100,7 +103,7 @@ class Questionnaire(models.Model):
 
     def find_duplicate_name(self):
         try:
-            Study.objects.get(study_director_id=self.study_director_id, study_id=self.study_id,
+            Questionnaire.objects.get(study_director_id=self.study_director_id, study_id=self.study_id,
                               questionnaire_name=self.questionnaire_name)
         except ObjectDoesNotExist:
             return True
@@ -115,6 +118,9 @@ class Questionnaire(models.Model):
         for k, v in trigger_events_dic.iteritems():
             t = TriggerEvent(trigger_events_id=self.id, name=k, value=v)
             t.save()
+
+    def __str__(self):
+        return self.questionnaire_name
 
 
 class TriggerEvent(models.Model):
@@ -172,16 +178,16 @@ class ScaleQuestion(CommonQuestion):
 
 
 class Answer(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True, blank=True)
-    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
-    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True, blank=True)
-    question_id = models.IntegerField('Question', null=True, blank=True)
-    proband_id = models.IntegerField(blank=True)
+    proband_id = models.ForeignKey('Proband', null=True, blank=True)
     submit_date_time = models.DateTimeField("Submit Date and Time", null=True, blank=True)
+    question_id = models.IntegerField('Question', null=True, blank=True)
     question_type = models.CharField("Question Type", max_length=30, blank=True)
     text_value = models.TextField("Answer of Text Question", blank=True)
     choice_value = models.CharField("Answer of Choice Question", max_length=30, blank=True)
     integer_value = models.FloatField("Answer of Scale Question", blank=True)
+
+    def __str__(self):
+        return self.text_value
 
 
 class Proband(models.Model):
