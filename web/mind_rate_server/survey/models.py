@@ -57,7 +57,7 @@ class Study(models.Model):
 
     def save(self, *args, **kwargs):
         if self.find_duplicate_name():
-            super(Study, self).save()
+            super().save()
 
     '''
     This method is to find out whether there is a duplicate of the study name in the studies of the same study director
@@ -81,7 +81,7 @@ class Questionnaire(models.Model):
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, blank=True, null=True)
     study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
     questionnaire_name = models.CharField("Questionnaire Name", max_length=30, blank=True)
-    # deadline_date_time = models.DateTimeField("Deadline Date and Time")
+    submit_date_time = models.DateTimeField("Deadline Date and Time", null=True, blank=True)
 
     '''
     This method has overriden the original save method
@@ -91,7 +91,7 @@ class Questionnaire(models.Model):
 
     def save(self, *args, **kwargs):
         if self.find_duplicate_name():
-            super(self, Questionnaire).save()
+            super().save()
 
     '''
     The method is to find out whether there is a duplicate of the questionnaire name in the same studies of the same study director
@@ -100,7 +100,7 @@ class Questionnaire(models.Model):
 
     def find_duplicate_name(self):
         try:
-            Study.objects.get(study_director_id=self.study_director_id, study_name=self.study_name,
+            Study.objects.get(study_director_id=self.study_director_id, study_id=self.study_id,
                               questionnaire_name=self.questionnaire_name)
         except ObjectDoesNotExist:
             return True
@@ -175,9 +175,9 @@ class Answer(models.Model):
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True, blank=True)
     study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True, blank=True)
     questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True, blank=True)
-    # question_id = models.ForeignKey('Question', on_delete=models.CASCADE)
+    question_id = models.IntegerField('Question')
     proband_id = models.IntegerField(blank=True)
-    hand_up_date_time = models.DateTimeField("Hand Up Date and Time", blank=True)
+    submit_date_time = models.DateTimeField("Submit Date and Time", blank=True)
     question_type = models.CharField("Question Type", max_length=30, blank=True)
     text_value = models.TextField("Answer of Text Question", blank=True)
     choice_value = models.CharField("Answer of Choice Question", max_length=30, blank=True)
