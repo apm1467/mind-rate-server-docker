@@ -9,7 +9,8 @@
       <h4>Questionnaire {{ questionnaire.questionnaire_name }}</h4>
 
       <ul style="list-style-type:none">
-        <li>End time: {{ questionnaire.deadline_date_time }}</li>
+        <li>Start date and time: {{ questionnaire.get_start_time }}</li>
+        <li>End date and time: {{ questionnaire.deadline_date_time }}</li>
 
         <li>Start condition:
           <ul>
@@ -18,21 +19,22 @@
             {% endfor %}
           </ul>
 
-        <li>Answers: {{ questionnaire.answer_set.all.count }}</li>
+        <li>Questionnaires released: </li>
+        <li>Answers received so far: </li>
       </ul>
     </div>
 
 
     {% endfor %}
 
-    {% with 5 as id %}
-    <form action="{% url 'view_answers' id %}" method="get">
+<!--TODO: a combobox to choose a study
+    <form action="{% url 'view_answers' 1 %}" method="get">
       <select>
+        {% for study in }
         <option value="1">Study 1</option>
-        <option value="2">Study 2</option>
       </select>
       <input type="submit" value="Submit">
     </form>
-    {% endwith %}
+-->
 
 {% endblock %}
