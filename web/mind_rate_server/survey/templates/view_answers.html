@@ -1,0 +1,38 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+  <h1>{{ study.study_name }}</h1>
+
+  {% for questionnaire in study.questionnaire_set.all %}
+    <div style="background-color:#E6E6E6;color:black;padding:20px;">
+      <h4>Questionnaire {{ questionnaire.questionnaire_name }}</h4>
+
+      <ul style="list-style-type:none">
+        <li>End time: {{ questionnaire.deadline_date_time }}</li>
+
+        <li>Start condition:
+          <ul>
+            {% for triggerEvent in questionnaire.triggerEvent_set.all %}
+            <li>{{ triggerEvent }}</li>
+            {% endfor %}
+          </ul>
+
+        <li>Answers: {{ questionnaire.answer_set.all.count }}</li>
+      </ul>
+    </div>
+
+
+    {% endfor %}
+
+    {% with 5 as id %}
+    <form action="{% url 'view_answers' id %}" method="get">
+      <select>
+        <option value="1">Study 1</option>
+        <option value="2">Study 2</option>
+      </select>
+      <input type="submit" value="Submit">
+    </form>
+    {% endwith %}
+
+{% endblock %}
