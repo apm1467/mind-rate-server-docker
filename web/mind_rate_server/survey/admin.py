@@ -35,3 +35,4 @@ class QuestionnaireAdmin(admin.ModelAdmin):
 admin.site.register(Study, StudyAdmin)
 admin.site.register(Questionnaire, QuestionnaireAdmin)
 admin.site.register(StudyDirector)
+admin.site.register(ChoiceQuestion)
