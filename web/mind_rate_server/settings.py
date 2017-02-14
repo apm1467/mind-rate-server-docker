@@ -128,7 +128,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
-LOGIN_REDIRECT_URL = '/'  # It means home view
+LOGIN_REDIRECT_URL = '/'  # give user staff permission and send user to admin site
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
