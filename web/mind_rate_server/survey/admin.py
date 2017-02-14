@@ -3,8 +3,13 @@ from django.contrib import admin
 from .models import Questionnaire, Study, StudyDirector, TextQuestion, \
 ChoiceQuestion, ScaleQuestion, TriggerEvent
 
+class QuestionnaireInline(admin.TabularInline):
+    model = Questionnaire
+    extra = 1
+
 class StudyAdmin(admin.ModelAdmin):
     list_display = ('study_name', 'start_date_time', 'end_date_time')
+    inlines = [QuestionnaireInline]
 
 class TextQuestionInline(admin.TabularInline):
     model = TextQuestion

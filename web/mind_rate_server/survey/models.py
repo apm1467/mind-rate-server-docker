@@ -73,6 +73,9 @@ class Study(models.Model):
     def __str__(self):
         return self.study_name
 
+    class Meta:
+        verbose_name_plural = "studies"
+
 
 '''
 This class takes a serial integer as primary key
