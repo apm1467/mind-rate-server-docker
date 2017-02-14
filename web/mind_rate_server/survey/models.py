@@ -45,8 +45,8 @@ class StudyDirector(models.Model):
 class Study(models.Model):
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
     study_name = models.CharField("Study Name", max_length=30)
-    start_date_time = models.DateTimeField("Start Date and Time")
-    end_date_time = models.DateTimeField("End Date and Time")
+    #start_date_time = models.DateTimeField("Start Date and Time")
+    #end_date_time = models.DateTimeField("End Date and Time")
 
     '''
     This method has overriden the original save method
@@ -83,7 +83,7 @@ class Questionnaire(models.Model):
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
     study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
     questionnaire_name = models.CharField("Questionnaire Name", max_length=30)
-    required_submit_date_time = models.DateTimeField("Deadline Date and Time", null=True)
+    # required_submit_date_time = models.DateTimeField("Deadline Date and Time", null=True)
     max_show_up_times_per_day = models.IntegerField("Max Show Up Times Per Day", null=True)
 
     '''
@@ -148,34 +148,21 @@ It contains the common attributes study_director_id, study_id, questionnaire_id,
 '''
 
 
-class CommonQuestion(models.Model):
+class Question(models.Model):
+    QUESTION_TYPE_CHOICES = (
+        ('Text', 'Text Question'),
+        ('Scale', 'Scale Question'),
+        ('Choice', 'Choice Question'),
+    )
     study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
     study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
     questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True)
-    question_type = models.CharField("Question Type", max_length=30)
+    question_type = models.CharField("Question Type", max_length=6, choices=QUESTION_TYPE_CHOICES)
     question_content = models.TextField("Question Content")
-
-    class Meta:
-        abstract = True
-
-
-class TextQuestion(CommonQuestion):
-    # Nothing should be defined here
-    pass
-
-
-class ChoiceQuestion(CommonQuestion):
-    """
-    To stored the options, different options will be separated by semicolon
-    """
-    option = models.TextField("Option")
-
-
-class ScaleQuestion(CommonQuestion):
+    options = models.TextField("Option")
     min_value = models.FloatField("Minimum")
     max_value = models.FloatField("Maximum")
     gap_value = models.FloatField("Gap")
-
 
 class Answer(models.Model):
     proband_id = models.ForeignKey('Proband', null=True)
