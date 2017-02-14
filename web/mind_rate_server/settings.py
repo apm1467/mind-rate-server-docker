@@ -57,7 +57,7 @@ ROOT_URLCONF = 'mind_rate_server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,7 +128,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
-LOGIN_REDIRECT_URL = '/'  # It means home view
+LOGIN_REDIRECT_URL = '/'  # give user staff permission and send user to admin site
 
 ACCOUNT_ACTIVATION_DAYS = 7
 

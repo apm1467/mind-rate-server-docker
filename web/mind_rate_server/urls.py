@@ -20,18 +20,13 @@ from mind_rate_server.survey.forms import LoginForm
 from registration.views import RegistrationView
 from mind_rate_server.survey import views
 
-
 urlpatterns = [
     url(r'', include('mind_rate_server.survey.urls')),
 
+    # redirect admin logout page
+    url(r'^admin/logout/', auth_views.logout, {'next_page': '/login'}, name='logout'),
+
     url(r'^admin/', admin.site.urls),
-
-    # url(r'', include('registration.backends.simple.urls')),
-
-    # url(r'^register/$', RegistrationView.as_view(), name='registration_register'),
-
-    # url(r'^signup/$', auth_views.login, {'template_name': 'registration/signup.html',
-    #                                     'authentication_form': UserCreationForm}, name='signup'),
 
     url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html',
                                         'authentication_form': LoginForm}, name='login'),
@@ -41,6 +36,9 @@ urlpatterns = [
     url(r'^accounts/', include('registration.backends.hmac.urls')),
 
     url(r'^study/(?P<study_id>\d+)/$', views.view_answers, name='view_answers'),
+
     # To define a study-downloading url
     url(r'^download/(?P<study_id>[1-9][0-9]*)$', views.view_download, name='view_download'),
+
+    url(r'^preview/(?P<questionnaire_id>\d+)/$', views.preview, name='preview'),
 ]

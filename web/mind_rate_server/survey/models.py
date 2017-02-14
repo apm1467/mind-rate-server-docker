@@ -73,6 +73,9 @@ class Study(models.Model):
     def __str__(self):
         return self.study_name
 
+    class Meta:
+        verbose_name_plural = "studies"
+
 
 '''
 This class takes a serial integer as primary key
@@ -141,6 +144,8 @@ class TriggerEvent(models.Model):
     name = models.CharField("Trigger Event Name", max_length=10, choices=TRIGGER_EVENT_CHOICES)
     value = models.CharField("Value", max_length=50)
 
+    def __str__(self):
+        return self.name
 
 '''
 The parent class of all the question classes
@@ -163,6 +168,9 @@ class Question(models.Model):
     min_value = models.FloatField("Minimum")
     max_value = models.FloatField("Maximum")
     gap_value = models.FloatField("Gap")
+
+    def __str__(self):
+        return self.question_content
 
 class Answer(models.Model):
     proband_id = models.ForeignKey('Proband', null=True)
