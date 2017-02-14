@@ -6,21 +6,23 @@
 
   {% for questionnaire in study.questionnaire_set.all %}
     <div style="background-color:#E6E6E6;color:black;padding:20px;">
-      <h4>Questionnaire {{ questionnaire.questionnaire_name }}</h4>
+      <h4>Questionnaire {{ questionnaire.pk }}: {{ questionnaire.questionnaire_name }}</h4>
 
       <ul style="list-style-type:none">
-        <li>End date and time: {{ questionnaire.required_submit_date_time|date:"D d M Y" }}
+        <li>Deadline date and time: {{ questionnaire.required_submit_date_time|date:"D d M Y" }}
           {{ questionnaire.required_submit_date_time|time:"H:i" }}</li>
+          <p>
 
         <li>Trigger event:
           <ul>
-            {% for triggerEvent in questionnaire.triggerevent_set.all %}
-            <li>{{ triggerEvent.name }}</li>
+            {% for triggerevent in questionnaire.triggerevent_set.all %}
+            <li>{{ triggerevent.name }}: {{ triggerevent.value }}</li>
             {% endfor %}
           </ul>
+          <p>
 
-        <li>Questionnaires released: </li>
-        <li>Answers received so far: </li>
+        <li>Questionnaires released: <!--TODO--></li><p>
+        <li>Answers received so far: <!--TODO--></li><p>
       </ul>
     </div>
 

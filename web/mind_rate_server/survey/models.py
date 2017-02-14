@@ -144,6 +144,8 @@ class TriggerEvent(models.Model):
     name = models.CharField("Trigger Event Name", max_length=10, choices=TRIGGER_EVENT_CHOICES)
     value = models.CharField("Value", max_length=50)
 
+    def __str__(self):
+        return self.name
 
 '''
 The parent class of all the question classes
