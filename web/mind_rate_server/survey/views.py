@@ -21,7 +21,8 @@ def home(request):
 
 def view_answers(request, study_id):
     study = get_object_or_404(Study, pk = study_id)
-    return render(request, 'view_answers.html', {"study":study})
+    user = request.user
+    return render(request, 'view_answers.html', {"study":study, "user":user})
 
 def preview(request, questionnaire_id):
     questionnaire = get_object_or_404(Study, pk = questionnaire_id)

@@ -9,13 +9,13 @@
       <h4>Questionnaire {{ questionnaire.questionnaire_name }}</h4>
 
       <ul style="list-style-type:none">
-        <li>Start date and time: {{ questionnaire.get_start_time }}</li>
-        <li>End date and time: {{ questionnaire.deadline_date_time }}</li>
+        <li>End date and time: {{ questionnaire.required_submit_date_time|date:"D d M Y" }}
+          {{ questionnaire.required_submit_date_time|time:"H:i" }}</li>
 
-        <li>Start condition:
+        <li>Trigger event:
           <ul>
-            {% for triggerEvent in questionnaire.triggerEvent_set.all %}
-            <li>{{ triggerEvent }}</li>
+            {% for triggerEvent in questionnaire.triggerevent_set.all %}
+            <li>{{ triggerEvent.name }}</li>
             {% endfor %}
           </ul>
 
