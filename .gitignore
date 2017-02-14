@@ -87,5 +87,7 @@ ENV/
 
 # macOS
 .DS_Store
+
 /web/db.sqlite3
-.idea
+.idea/
+/web/mind_rate_server/survey/migrations
