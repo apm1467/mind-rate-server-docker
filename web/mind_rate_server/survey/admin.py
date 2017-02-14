@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Questionnaire, Study, StudyDirector, TextQuestion, ChoiceQuestion, ScaleQuestion, TriggerEvent
+from .models import Questionnaire, Study, StudyDirector, TextQuestion, \
+ChoiceQuestion, ScaleQuestion, TriggerEvent
 
 class StudyAdmin(admin.ModelAdmin):
     list_display = ('study_name', 'start_date_time', 'end_date_time')
@@ -22,7 +23,8 @@ class TriggerEventInline(admin.TabularInline):
     extra = 1
 
 class QuestionnaireAdmin(admin.ModelAdmin):
-    inlines = [TextQuestionInline, ChoiceQuestionInline, ScaleQuestionInline, TriggerEventInline]
+    inlines = [TextQuestionInline, ChoiceQuestionInline, ScaleQuestionInline,
+    TriggerEventInline]
     list_display = ('questionnaire_name', 'required_submit_date_time')
 
 admin.site.register(Study, StudyAdmin)
