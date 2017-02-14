@@ -1,0 +1,55 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<h1>Preview</h1>
+<h2>Questionnaire {{ questionnaire.pk }}: {{ questionnaire.questionnaire_name }}</h2>
+
+
+<div style="background-color:#E6E6E6;color:black;padding:20px;">
+  <h3>Text questions:</h3>
+  <ul style="list-style-type:none">
+    {% for question in questionnaire.textquestion_set.all %}
+      <li>Q{{ forloop.counter }}: {{ question.question_content }}</li>
+      <p>
+    {% endfor %}
+  </ul>
+</div>
+
+<p></p>
+
+<div style="background-color:#E6E6E6;color:black;padding:20px;">
+  <h3>Choice questions:</h3>
+  <ul style="list-style-type:none">
+    {% for question in questionnaire.choicequestion_set.all %}
+      <li>Q{{ forloop.counter }}: {{ question.question_content }}</li>
+
+      <ul>
+        {% for option in questionnaire.choicequestion_set.all %}
+        <li>{{ option }}</li>
+        {% endfor %}
+      </ul>
+      <p>
+    {% endfor %}
+  </ul>
+</div>
+
+<p></p>
+
+<div style="background-color:#E6E6E6;color:black;padding:20px;">
+  <h3>Scale questions:</h3>
+  <ul style="list-style-type:none">
+    {% for question in questionnaire.scalequestion_set.all %}
+    <li>Q{{ forloop.counter }}: {{ question.question_content }}</li>
+    <ul style="list-style-type:none">
+      <li>Minimum: {{ question.min_value }}</li>
+      <li>Maximum: {{ question.max_value }}</li>
+      <li>Gap: {{ question.gap_value }}</li>
+    </ul>
+
+    <p>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}

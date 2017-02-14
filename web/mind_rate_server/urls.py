@@ -37,4 +37,6 @@ urlpatterns = [
     url(r'^accounts/', include('registration.backends.hmac.urls')),
 
     url(r'^study/(?P<study_id>\d+)/$', views.view_answers, name='view_answers'),
+
+    url(r'^preview/(?P<questionnaire_id>\d+)/$', views.preview, name='preview'),
 ]
