@@ -26,17 +26,17 @@
       </ul>
     </div>
 
+{% endfor %}
 
-    {% endfor %}
-
-<!--TODO: a combobox to choose a study
+<!--TODO: a combobox to choose between studies
     <form action="{% url 'view_answers' 1 %}" method="get">
       <select>
-        {% for study in }
+        {% for study in user.study_set.all %}
         <option value="1">Study 1</option>
+        {% endfor %}
       </select>
       <input type="submit" value="Submit">
     </form>
--->
+  -->
 
 {% endblock %}

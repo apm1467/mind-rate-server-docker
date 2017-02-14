@@ -73,9 +73,6 @@ class Study(models.Model):
     def __str__(self):
         return self.study_name
 
-#TODO:  def get_start_time(self):
-        #return self.start_date_time.strftime("%B %d, %Y")
-
 
 '''
 This class takes a serial integer as primary key
