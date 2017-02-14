@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<h1>Preview</h1>
+<h2>Questionnaire {{ questionnaire.pk }}: {{ questionnaire.questionnaire_name }}</h2>
+
+<ul style="list-style-type:none">
+  {% for question in questionnaire.question_set.all %}
+    <h3>Q{{ forloop.counter }}: {{ question.question_name }}</h3>
+    <li>{% if }
+  {% endfor %}
+</ul>
+
+{% endblock %}
