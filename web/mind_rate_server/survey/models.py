@@ -60,7 +60,8 @@ class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
     name = models.CharField("Questionnaire name", max_length=30)
     due_after = models.DurationField(
-        "Valid time duration after displayed, in [DD] [HH:[MM:]]ss format", null=True)
+        "(Optional) Valid time duration after displayed, in [DD] [HH:[MM:]]ss format, default unlimited time",
+        null=True, blank=True)
     max_trigger_times_per_day = models.PositiveIntegerField(
         "Maximal number the questionnaire can be displayed per day", null=True)
 
@@ -69,25 +70,76 @@ class Questionnaire(models.Model):
 
 
 class TriggerEvent(models.Model):
-    # The choices of the trigger events
-    TRIGGER_EVENT_CHOICES = (
-        ('Acc', 'Accelerometer'),
-        ('Li_Acc', 'Linear Acceleration'),
-        ('Grav', 'Gravity'),
-        ('Rota', 'Rotation Vector'),
-        ('Tem', 'Temperature'),
-        ('Light', 'Light'),
-        ('Pres', 'Pressure'),
-        ('Hum', 'Relative Humidity'),
-        ('Mag', 'Magnetic Field'),
-        ('Prox', 'Proximity'),
+    questionnaire = models.OneToOneField(Questionnaire, on_delete=models.CASCADE, null=True)
+    min_time_space = models.DurationField(
+        "Minimal time space between two trigger events, in [DD] [HH:[MM:]]ss format", null=True)
+
+    # trigger options based on time
+    datetime = models.DateTimeField("(Optional) Triggered at a specific combination of a date and a time",
+                                    null=True, blank=True)
+    time = models.TimeField("(Optional) Triggered at a time, independent of any particular day",
+                            null=True, blank=True)
+
+    # trigger options that return Boolean values
+    triggeredWhenCalendarEventBegins = models.BooleanField("Triggered when a event on Android calendar begins",
+                                                           default=False)
+    triggeredWhenCalendarEventEnds = models.BooleanField("Triggered when a event on Android calendar ends",
+                                                         default=False)
+    triggeredWhenFacebookNotificationComes = models.BooleanField("Triggered each time a Facebook notification comes",
+                                                                 default=False)
+    triggeredWhenWhatsAppNotificationComes = models.BooleanField("Triggered each time a WhatsApp notification comes",
+                                                                 default=False)
+    triggeredWhenSmsComes = models.BooleanField("Triggered each time a SMS comes", default=False)
+    triggeredWhenPhoneCallEnds = models.BooleanField("Triggered each time a phone call ends", default=False)
+
+    # trigger option based on Android user activity API
+    IN_VEHICLE = "IN_VEHICLE"
+    ON_BICYCLE = "ON_BICYCLE"
+    ON_FOOT = "ON_FOOT"
+    RUNNING = "RUNNING"
+    STILL = "STILL"
+    TILTING = "TILTING"
+    UNKNOWN = "UNKNOWN"
+    WALKING = "WALKING"
+    USER_ACTIVITY_CHOICES = (
+        (IN_VEHICLE, "The device is in a vehicle, such as a car"),
+        (ON_BICYCLE, "The device is on a bicycle"),
+        (ON_FOOT, "The device is on a user who is walking or running"),
+        (RUNNING, "The device is on a user who is running"),
+        (STILL, "The device is still (not moving)"),
+        (TILTING, "The device angle relative to gravity changed significantly (tilting)"),
+        (UNKNOWN, "Unable to detect the current activity"),
+        (WALKING, "The device is on a user who is walking")
     )
-    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True)
-    name = models.CharField("Trigger Event Name", max_length=10, choices=TRIGGER_EVENT_CHOICES)
-    value = models.CharField("Value", max_length=50)
+    user_activity = models.CharField("(Optional) Triggered at a specific user activity",
+                                     max_length=10, choices=USER_ACTIVITY_CHOICES, null=True, blank=True)
+
+    # trigger options based on environment sensors
+    VERY_HIGH = "VH"
+    HIGH = "H"
+    MEDIUM = "M"
+    LOW = "L"
+    VERY_LOW = "VL"
+    SENSOR_LEVEL_CHOICES = (
+        (VERY_HIGH, "very high"),
+        (HIGH, "high"),
+        (MEDIUM, "medium"),
+        (LOW, "low"),
+        (VERY_LOW, "very low")
+    )
+    light = models.CharField("(Optional) Triggered at a specific ambient light level",
+                             max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
+    relative_humidity = models.CharField("(Optional) Triggered at a specific relative humidity level",
+                                         max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
+    air_pressure = models.CharField("(Optional) Triggered at a specific air pressure level",
+                                    max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
+    linear_acceleration = models.CharField("(Optional) Triggered at a specific linear acceleration level",
+                                           max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
+    proximity = models.CharField("(Optional) Triggered at a specific proximity (distance) between user and device",
+                                 max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return "%s trigger event" % self.questionnaire.name
 
 '''
 The parent class of all the question classes

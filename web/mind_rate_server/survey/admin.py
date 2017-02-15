@@ -1,4 +1,5 @@
 from django.contrib import admin
+import nested_admin
 from .models import Questionnaire, Study, TextQuestion, \
     ChoiceQuestion, ScaleQuestion, TriggerEvent
 from django.contrib.auth.models import User, Permission
@@ -16,21 +17,39 @@ class ScaleQuestionInline(admin.TabularInline):
     model = ScaleQuestion
     extra = 1
 
-class TriggerEventInline(admin.TabularInline):
+
+class TriggerEventInline(nested_admin.NestedStackedInline):
     model = TriggerEvent
+    fieldsets = [
+        (None, {'fields': ['min_time_space']}),
+
+        ('trigger options based on time', {'fields': ['datetime', 'time'], 'classes': ['collapse']}),
+
+        ('trigger options based on calender, calls or notifications',
+         {'fields': ['triggeredWhenCalendarEventBegins', 'triggeredWhenCalendarEventEnds',
+                     'triggeredWhenFacebookNotificationComes', 'triggeredWhenWhatsAppNotificationComes',
+                     'triggeredWhenSmsComes', 'triggeredWhenPhoneCallEnds'], 'classes': ['collapse']}),
+
+        ('trigger options based on user activities', {'fields': ['user_activity'], 'classes': ['collapse']}),
+
+        ('trigger options based on environment sensors',
+         {'fields': ['light', 'relative_humidity', 'air_pressure', 'linear_acceleration', 'proximity'],
+          'classes': ['collapse']}),
+
+    ]
+    list_display = ('name', 'due_after', 'max_trigger_times_per_day')
     extra = 1
 
 
-class QuestionnaireInline(admin.StackedInline):
+class QuestionnaireInline(nested_admin.NestedStackedInline):
     model = Questionnaire
-    inlines = [TextQuestionInline, ChoiceQuestionInline, ScaleQuestionInline,
-               TriggerEventInline]
+    inlines = [TriggerEventInline]
     fields = ['name', 'due_after', 'max_trigger_times_per_day']
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
     extra = 0
 
 
-class StudyAdmin(admin.ModelAdmin):
+class StudyAdmin(nested_admin.NestedModelAdmin):
     model = Study
     fields = ['name', 'start_date_time', 'end_date_time']  # which fields will be asked
     list_display = ('name', 'start_date_time', 'end_date_time') # fields displayed on the change list page
