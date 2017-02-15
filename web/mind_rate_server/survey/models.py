@@ -43,35 +43,13 @@ class StudyDirector(models.Model):
 
 
 class Study(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
-    study_name = models.CharField("Study Name", max_length=30)
-    #start_date_time = models.DateTimeField("Start Date and Time")
-    #end_date_time = models.DateTimeField("End Date and Time")
-
-    '''
-    This method has overriden the original save method
-    A new record of study will be saved if there is no duplicate of the study name
-    The *args and **kwargs are for the future extension of the method
-    '''
-
-    def save(self, *args, **kwargs):
-        if self.find_duplicate_name():
-            super(Study, self).save(*args, **kwargs)
-
-    '''
-    This method is to find out whether there is a duplicate of the study name in the studies of the same study director
-    This method will return true if NO duplicate is found; otherwise false
-    '''
-
-    def find_duplicate_name(self):
-        try:
-            Study.objects.get(study_director_id=self.study_director_id, study_name=self.study_name)
-        except ObjectDoesNotExist:
-            return True
-        return False
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    name = models.CharField("Study Name", max_length=30)
+    start_date_time = models.DateTimeField("Start Date and Time")
+    end_date_time = models.DateTimeField("End Date and Time")
 
     def __str__(self):
-        return self.study_name
+        return self.name
 
     class Meta:
         verbose_name_plural = "studies"

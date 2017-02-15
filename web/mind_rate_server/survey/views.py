@@ -1,11 +1,12 @@
 from django.core import serializers
-from .models import Study, Questionnaire, TriggerEvent, Question
+from .models import Study, Questionnaire, TriggerEvent
 from django.shortcuts import render, get_object_or_404, redirect, get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 
 
+# give user permissions and redirect user to the admin site
 @login_required(login_url="login/")
 def home(request):
     user = User.objects.get(username=request.user.username)
@@ -13,12 +14,12 @@ def home(request):
     # give user access to the admin site
     user.is_staff = True
 
-    # all permissions of the survey app
+    # give user all creation permissions of the survey app
     content_type_list = ContentType.objects.filter(app_label='survey')
 
     for content_type in content_type_list:
         user.user_permissions.add(
-            *Permission.objects.filter(content_type__exact=content_type)
+            *Permission.objects.filter(content_type=content_type)
         )
 
     user.save()
