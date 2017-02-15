@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mind_rate_server.survey',
+    'nested_admin'
 ]
 
 MIDDLEWARE = [

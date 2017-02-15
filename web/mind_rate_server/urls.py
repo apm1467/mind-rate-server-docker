@@ -41,4 +41,6 @@ urlpatterns = [
     url(r'^download/(?P<study_id>[1-9][0-9]*)$', views.view_download, name='view_download'),
 
     url(r'^preview/(?P<questionnaire_id>\d+)/$', views.preview, name='preview'),
+
+    url(r'^_nested_admin/', include('nested_admin.urls')),
 ]
