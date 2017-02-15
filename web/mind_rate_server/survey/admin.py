@@ -4,9 +4,30 @@ from .models import Questionnaire, Study, TextQuestion, \
 from django.contrib.auth.models import User, Permission
 
 
-class QuestionnaireInline(admin.TabularInline):
-    model = Questionnaire
+class TextQuestionInline(admin.TabularInline):
+    model = TextQuestion
     extra = 1
+
+class ChoiceQuestionInline(admin.TabularInline):
+    model = ChoiceQuestion
+    extra = 1
+
+class ScaleQuestionInline(admin.TabularInline):
+    model = ScaleQuestion
+    extra = 1
+
+class TriggerEventInline(admin.TabularInline):
+    model = TriggerEvent
+    extra = 1
+
+
+class QuestionnaireInline(admin.StackedInline):
+    model = Questionnaire
+    inlines = [TextQuestionInline, ChoiceQuestionInline, ScaleQuestionInline,
+               TriggerEventInline]
+    fields = ['name', 'due_after', 'max_trigger_times_per_day']
+    list_display = ('name', 'due_after', 'max_trigger_times_per_day')
+    extra = 0
 
 
 class StudyAdmin(admin.ModelAdmin):
@@ -45,27 +66,4 @@ class StudyAdmin(admin.ModelAdmin):
         return True
 
 
-class TextQuestionInline(admin.TabularInline):
-    model = TextQuestion
-    extra = 1
-
-class ChoiceQuestionInline(admin.TabularInline):
-    model = ChoiceQuestion
-    extra = 1
-
-class ScaleQuestionInline(admin.TabularInline):
-    model = ScaleQuestion
-    extra = 1
-
-class TriggerEventInline(admin.TabularInline):
-    model = TriggerEvent
-    extra = 1
-
-class QuestionnaireAdmin(admin.ModelAdmin):
-    inlines = [TextQuestionInline, ChoiceQuestionInline, ScaleQuestionInline,
-    TriggerEventInline]
-    list_display = ('questionnaire_name', 'required_submit_date_time')
-
 admin.site.register(Study, StudyAdmin)
-admin.site.register(Questionnaire, QuestionnaireAdmin)
-admin.site.register(ChoiceQuestion)

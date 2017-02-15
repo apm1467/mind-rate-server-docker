@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 
 '''
 CAUTION: when initializing an instance of this class, be sure to catch the IntegrityError, which is caused by a duplicate of primary key "mail_address" in table StudyDirector
@@ -44,9 +45,9 @@ class StudyDirector(models.Model):
 
 class Study(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    name = models.CharField("Study Name", max_length=30)
-    start_date_time = models.DateTimeField("Start Date and Time")
-    end_date_time = models.DateTimeField("End Date and Time")
+    name = models.CharField("Study name", max_length=30)
+    start_date_time = models.DateTimeField("Start time")
+    end_date_time = models.DateTimeField("End time")
 
     def __str__(self):
         return self.name
@@ -55,53 +56,16 @@ class Study(models.Model):
         verbose_name_plural = "studies"
 
 
-'''
-This class takes a serial integer as primary key
-'''
-
-
 class Questionnaire(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
-    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
-    questionnaire_name = models.CharField("Questionnaire Name", max_length=30)
-    # required_submit_date_time = models.DateTimeField("Deadline Date and Time", null=True)
-    max_show_up_times_per_day = models.IntegerField("Max Show Up Times Per Day", null=True)
-
-    '''
-    This method has overriden the original save method
-    A new record of questionnaire will be saved if there is no duplicate of the questionnaire name
-    The *args and **kwargs are for the future extension of the method
-    '''
-
-    def save(self, *args, **kwargs):
-        if self.find_duplicate_name():
-            super(Questionnaire, self).save(*args, **kwargs)
-
-    '''
-    The method is to find out whether there is a duplicate of the questionnaire name in the same studies of the same study director
-    This method will return true if NO duplicate is found; otherwise false
-    '''
-
-    def find_duplicate_name(self):
-        try:
-            Questionnaire.objects.get(study_director_id=self.study_director_id, study_id=self.study_id,
-                              questionnaire_name=self.questionnaire_name)
-        except ObjectDoesNotExist:
-            return True
-        return False
-
-    '''
-    This method will take a dictionary as parameter and set the trigger events of the questionnaire accordingly
-    The keys in the dictionary represent the name of trigger event, the values represent the parameter for the trigger event
-    '''
-
-    def set_trigger_event(self, trigger_events_dic):
-        for k, v in trigger_events_dic.iteritems():
-            t = TriggerEvent(trigger_events_id=self.id, name=k, value=v)
-            t.save()
+    study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
+    name = models.CharField("Questionnaire name", max_length=30)
+    due_after = models.DurationField(
+        "Valid time duration after displayed, in [DD] [HH:[MM:]]ss format", null=True)
+    max_trigger_times_per_day = models.PositiveIntegerField(
+        "Maximal number the questionnaire can be displayed per day", null=True)
 
     def __str__(self):
-        return self.questionnaire_name
+        return self.name
 
 
 class TriggerEvent(models.Model):

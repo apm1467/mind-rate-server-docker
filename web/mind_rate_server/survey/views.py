@@ -14,7 +14,7 @@ def home(request):
     # give user access to the admin site
     user.is_staff = True
 
-    # give user all creation permissions of the survey app
+    # give user all permissions of the survey app
     content_type_list = ContentType.objects.filter(app_label='survey')
 
     for content_type in content_type_list:
