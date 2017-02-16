@@ -60,10 +60,10 @@ class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
     name = models.CharField("Questionnaire name", max_length=30)
     due_after = models.DurationField(
-        "(Optional) Valid time duration after displayed, in [DD] [HH:[MM:]]ss format, default unlimited time",
+        "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format, default unlimited",
         null=True, blank=True)
     max_trigger_times_per_day = models.PositiveIntegerField(
-        "Maximal number the questionnaire can be displayed per day", null=True)
+        "Maximal trigger times per day", null=True)
 
     def __str__(self):
         return self.name
@@ -72,25 +72,25 @@ class Questionnaire(models.Model):
 class TriggerEvent(models.Model):
     questionnaire = models.OneToOneField(Questionnaire, on_delete=models.CASCADE, null=True)
     min_time_space = models.DurationField(
-        "Minimal time space between two trigger events, in [DD] [HH:[MM:]]ss format", null=True)
+        "Minimal time space between two trigger events; in [DD] [HH:[MM:]]ss format", null=True)
 
     # trigger options based on time
-    datetime = models.DateTimeField("(Optional) Triggered at a specific combination of a date and a time",
+    datetime = models.DateTimeField("(Optional) A specific date and time",
                                     null=True, blank=True)
-    time = models.TimeField("(Optional) Triggered at a time, independent of any particular day",
+    time = models.TimeField("(Optional) A specific time everyday",
                             null=True, blank=True)
 
     # trigger options that return Boolean values
-    triggeredWhenCalendarEventBegins = models.BooleanField("Triggered when a event on Android calendar begins",
+    triggeredWhenCalendarEventBegins = models.BooleanField("Triggered when a calendar event begins",
                                                            default=False)
-    triggeredWhenCalendarEventEnds = models.BooleanField("Triggered when a event on Android calendar ends",
+    triggeredWhenCalendarEventEnds = models.BooleanField("Triggered when a calendar event ends",
                                                          default=False)
-    triggeredWhenFacebookNotificationComes = models.BooleanField("Triggered each time a Facebook notification comes",
+    triggeredWhenFacebookNotificationComes = models.BooleanField("Triggered when a Facebook notification comes",
                                                                  default=False)
-    triggeredWhenWhatsAppNotificationComes = models.BooleanField("Triggered each time a WhatsApp notification comes",
+    triggeredWhenWhatsAppNotificationComes = models.BooleanField("Triggered when a WhatsApp notification comes",
                                                                  default=False)
-    triggeredWhenSmsComes = models.BooleanField("Triggered each time a SMS comes", default=False)
-    triggeredWhenPhoneCallEnds = models.BooleanField("Triggered each time a phone call ends", default=False)
+    triggeredWhenSmsComes = models.BooleanField("Triggered when a SMS comes", default=False)
+    triggeredWhenPhoneCallEnds = models.BooleanField("Triggered when a phone call ends", default=False)
 
     # trigger option based on Android user activity API
     IN_VEHICLE = "IN_VEHICLE"
@@ -108,10 +108,9 @@ class TriggerEvent(models.Model):
         (RUNNING, "The device is on a user who is running"),
         (STILL, "The device is still (not moving)"),
         (TILTING, "The device angle relative to gravity changed significantly (tilting)"),
-        (UNKNOWN, "Unable to detect the current activity"),
         (WALKING, "The device is on a user who is walking")
     )
-    user_activity = models.CharField("(Optional) Triggered at a specific user activity",
+    user_activity = models.CharField("(Optional) User activity",
                                      max_length=10, choices=USER_ACTIVITY_CHOICES, null=True, blank=True)
 
     # trigger options based on environment sensors
@@ -127,15 +126,15 @@ class TriggerEvent(models.Model):
         (LOW, "low"),
         (VERY_LOW, "very low")
     )
-    light = models.CharField("(Optional) Triggered at a specific ambient light level",
+    light = models.CharField("(Optional) Light",
                              max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
-    relative_humidity = models.CharField("(Optional) Triggered at a specific relative humidity level",
+    relative_humidity = models.CharField("(Optional) Relative humidity",
                                          max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
-    air_pressure = models.CharField("(Optional) Triggered at a specific air pressure level",
+    air_pressure = models.CharField("(Optional) Air pressure",
                                     max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
-    linear_acceleration = models.CharField("(Optional) Triggered at a specific linear acceleration level",
+    linear_acceleration = models.CharField("(Optional) Linear acceleration",
                                            max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
-    proximity = models.CharField("(Optional) Triggered at a specific proximity (distance) between user and device",
+    proximity = models.CharField("(Optional) Proximity (distance)",
                                  max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
 
     def __str__(self):
