@@ -23,6 +23,8 @@ from mind_rate_server.survey import views
 urlpatterns = [
     url(r'', include('mind_rate_server.survey.urls')),
 
+    url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
+
     # redirect admin logout page
     url(r'^admin/logout/', auth_views.logout, {'next_page': '/login'}, name='logout'),
 
