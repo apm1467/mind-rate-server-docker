@@ -60,7 +60,7 @@ class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
     name = models.CharField("Questionnaire name", max_length=30)
     due_after = models.DurationField(
-        "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format, default unlimited",
+        "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format",
         null=True, blank=True)
     max_trigger_times_per_day = models.PositiveIntegerField(
         "Maximal trigger times per day", null=True)
@@ -68,11 +68,14 @@ class Questionnaire(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        order_with_respect_to = 'study'
+
 
 class TriggerEvent(models.Model):
     questionnaire = models.OneToOneField(Questionnaire, on_delete=models.CASCADE, null=True)
     min_time_space = models.DurationField(
-        "Minimal time space between two trigger events; in [DD] [HH:[MM:]]ss format", null=True)
+        "Minimal time space between two trigger events; in [HH:[MM:]]ss format", null=True)
 
     # trigger options based on time
     datetime = models.DateTimeField("(Optional) A specific date and time",
@@ -140,42 +143,47 @@ class TriggerEvent(models.Model):
     def __str__(self):
         return "%s trigger event" % self.questionnaire.name
 
-'''
-The parent class of all the question classes
-It contains the common attributes study_director_id, study_id, questionnaire_id, question_type and question_content
-'''
 
-
-class Question(models.Model):
-    QUESTION_TYPE_CHOICES = (
-        ('Text', 'Text Question'),
-        ('Scale', 'Scale Question'),
-        ('Choice', 'Choice Question'),
-    )
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
-    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
-    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True)
-    question_type = models.CharField("Question Type", max_length=6, choices=QUESTION_TYPE_CHOICES)
-    question_content = models.TextField("Question Content")
-    options = models.TextField("Option")
-    min_value = models.FloatField("Minimum")
-    max_value = models.FloatField("Maximum")
-    gap_value = models.FloatField("Gap")
+class AbstractQuestion(models.Model):
+    questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE, null=True)
+    question_text = models.CharField(max_length=200, null=True)
+    show_by_default = models.BooleanField("Show by default (False if the question is hidden by default, and will only "
+                                          "be showed to proband if it is triggered as a follow up question)",
+                                          default=True)
+    position = models.PositiveSmallIntegerField("Position", null=True)  # position on admin site
 
     def __str__(self):
-        return self.question_content
+        return self.question_text
 
-class Answer(models.Model):
-    proband_id = models.ForeignKey('Proband', null=True)
-    submit_date_time = models.DateTimeField("Submit Date and Time", null=True)
-    question_id = models.IntegerField("Question ID", null=True)
-    question_type = models.CharField("Question Type", max_length=30)
-    text_value = models.TextField("Answer of Text Question", blank=True)
-    choice_value = models.CharField("Answer of Choice Question", max_length=30)
-    integer_value = models.FloatField("Answer of Scale Question")
+    class Meta:
+        abstract = True
+        ordering = ['position']
 
-    def __str__(self):
-        return self.text_value
+
+class TextQuestion(AbstractQuestion):
+    pass
+
+
+class DragScaleQuestion(AbstractQuestion):
+    min_value = models.FloatField(default=0)
+    max_value = models.FloatField(default=10)
+
+
+class SingleChoiceQuestion(AbstractQuestion):
+    pass
+
+
+class MultiChoiceQuestion(AbstractQuestion):
+    pass
+
+
+class ChoiceOption(models.Model):
+    # this class is part of either a single or a multi question
+    single_choice_question = models.ForeignKey(SingleChoiceQuestion, on_delete=models.CASCADE, null=True)
+    multi_choice_question = models.ForeignKey(MultiChoiceQuestion, on_delete=models.CASCADE, null=True)
+
+    choice_text = models.CharField(max_length=200)
+    next_question_position = models.PositiveSmallIntegerField("Actual position of the follow up question", null=True)
 
 
 class Proband(models.Model):

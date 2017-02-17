@@ -1,21 +1,49 @@
 from django.contrib import admin
 import nested_admin
-from .models import Questionnaire, Study, TextQuestion, \
-    ChoiceQuestion, ScaleQuestion, TriggerEvent
-from django.contrib.auth.models import User, Permission
+from .models import Questionnaire, Study, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
+    DragScaleQuestion, TriggerEvent, ChoiceOption
+from django.contrib.auth.models import User
 
 
-class TextQuestionInline(admin.TabularInline):
+class TextQuestionInline(nested_admin.NestedStackedInline):
     model = TextQuestion
-    extra = 1
+    fields = ['show_by_default', 'question_text', 'position']
+    sortable_field_name = 'position'
+    extra = 0
 
-class ChoiceQuestionInline(admin.TabularInline):
-    model = ChoiceQuestion
-    extra = 1
 
-class ScaleQuestionInline(admin.TabularInline):
-    model = ScaleQuestion
-    extra = 1
+class ChoiceOptionInline(nested_admin.NestedStackedInline):
+    model = ChoiceOption
+    fieldsets = [
+        (None, {'fields': ['choice_text']}),
+
+        ('(Optional) follow up question for this choice option', {'fields': ['next_question_position']})
+    ]
+    extra = 0
+
+
+class SingleChoiceQuestionInline(nested_admin.NestedStackedInline):
+    model = SingleChoiceQuestion
+    fields = ['show_by_default', 'question_text', 'position']
+    inlines = [ChoiceOptionInline]
+    classes = ('grp-collapse grp-open',)
+    sortable_field_name = 'position'
+    extra = 0
+
+
+class MultiChoiceQuestionInline(nested_admin.NestedStackedInline):
+    model = MultiChoiceQuestion
+    fields = ['show_by_default', 'question_text', 'position']
+    inlines = [ChoiceOptionInline]
+    sortable_field_name = 'position'
+    extra = 0
+
+
+class DragScaleQuestionInline(nested_admin.NestedStackedInline):
+    model = DragScaleQuestion
+    fields = ['show_by_default', 'question_text', 'min_value', 'max_value', 'position']
+    sortable_field_name = 'position'
+    extra = 0
 
 
 class TriggerEventInline(nested_admin.NestedStackedInline):
@@ -23,36 +51,36 @@ class TriggerEventInline(nested_admin.NestedStackedInline):
     fieldsets = [
         (None, {'fields': ['min_time_space']}),
 
-        ('trigger options based on time', {'fields': ['datetime', 'time'], 'classes': ['collapse']}),
+        ('trigger options based on time', {'fields': ['datetime', 'time']}),
 
         ('trigger options based on calender, calls or notifications',
          {'fields': ['triggeredWhenCalendarEventBegins', 'triggeredWhenCalendarEventEnds',
                      'triggeredWhenFacebookNotificationComes', 'triggeredWhenWhatsAppNotificationComes',
-                     'triggeredWhenSmsComes', 'triggeredWhenPhoneCallEnds'], 'classes': ['collapse']}),
+                     'triggeredWhenSmsComes', 'triggeredWhenPhoneCallEnds']}),
 
-        ('trigger options based on user activities', {'fields': ['user_activity'], 'classes': ['collapse']}),
+        ('trigger options based on user activities', {'fields': ['user_activity']}),
 
         ('trigger options based on environment sensors',
-         {'fields': ['light', 'relative_humidity', 'air_pressure', 'linear_acceleration', 'proximity'],
-          'classes': ['collapse']}),
-
+         {'fields': ['light', 'relative_humidity', 'air_pressure', 'linear_acceleration', 'proximity']})
     ]
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
-    extra = 1
+    extra = 0
 
 
 class QuestionnaireInline(nested_admin.NestedStackedInline):
     model = Questionnaire
-    inlines = [TriggerEventInline]
+    inlines = [TriggerEventInline, TextQuestionInline, SingleChoiceQuestionInline,
+               MultiChoiceQuestionInline, DragScaleQuestionInline]
     fields = ['name', 'due_after', 'max_trigger_times_per_day']
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
+    classes = ('grp-collapse grp-open',)
     extra = 0
 
 
 class StudyAdmin(nested_admin.NestedModelAdmin):
     model = Study
     fields = ['name', 'start_date_time', 'end_date_time']  # which fields will be asked
-    list_display = ('name', 'start_date_time', 'end_date_time') # fields displayed on the change list page
+    list_display = ('name', 'start_date_time', 'end_date_time')  # fields displayed on the change list page
     inlines = [QuestionnaireInline]
 
     # override to attach request.user to the object prior to saving
