@@ -1,46 +1,5 @@
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
-
-'''
-CAUTION: when initializing an instance of this class, be sure to catch the IntegrityError, which is caused by a duplicate of primary key "mail_address" in table StudyDirector
-'''
-class StudyDirector(models.Model):
-    '''
-    To check whether the mail address is validated
-    An unvalid mail address will cause ValidationError
-    '''
-    mail_address = models.EmailField("Email-Address", max_length=50, primary_key=True)
-    titel = models.CharField("Titel", max_length=20)
-
-    '''
-    The one underscores are to define attribute "passwort" as private
-    '''
-    _passwort = models.CharField("Passwort", max_length=20)
-
-    '''
-    To check whether the account exists and the passwort is valid
-    If the passwort is valid, this method will return true; otherwise false
-    '''
-
-    '''
-    To get the private attribute __passwort outside this class
-    '''
-
-    @property
-    def passwort(self):
-        return self._passwort
-
-    '''
-    To reset the passwort
-    '''
-
-    @passwort.setter
-    def passwort(self, new_passwort):
-        self._passwort = new_passwort
-
-    def __str__(self):
-        return self.mail_address
 
 
 class Study(models.Model):
