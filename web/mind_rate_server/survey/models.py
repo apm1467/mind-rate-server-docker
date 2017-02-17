@@ -187,18 +187,58 @@ class ChoiceOption(models.Model):
 
 
 class Proband(models.Model):
-    study_director_id = models.ForeignKey('StudyDirector', on_delete=models.CASCADE, null=True)
-    study_id = models.ForeignKey('Study', on_delete=models.CASCADE, null=True)
+    study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
 
 
-class NotAnsweredQuestionnaire(models.Model):
-    # This attribute represents the proband ID
-    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE, null=True)
-    questionnaire_id = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=True)
+# simulation of a dictionary-like key-value pair for Proband
+class ProbandInfoCell(models.Model):
+    proband = models.ForeignKey(Proband, on_delete=models.CASCADE, null=True)
+    key = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
 
 
-class PersonalInformation(models.Model):
-    proband_id = models.ForeignKey('Proband', on_delete=models.CASCADE, null=True)
-    personal_information_name = models.CharField(max_length=30)
-    string_value = models.CharField(max_length=30)
-    integer_value = models.IntegerField()
+class QuestionnaireAnswer(models.Model):
+    questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE, null=True)
+    submitter = models.ForeignKey(Proband, on_delete=models.CASCADE, null=True)
+    submit_time = models.DateTimeField(null=True)
+
+    class Meta:
+        order_with_respect_to = 'questionnaire'
+
+
+# simulation of a dictionary-like key-value pair for QuestionnaireAnswer
+class SensorValueCell(models.Model):
+    questionnaire_answer = models.ForeignKey(QuestionnaireAnswer, on_delete=models.CASCADE, null=True)
+    key = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
+
+
+class AbstractQuestionAnswer(models.Model):
+    questionnaire_answer = models.ForeignKey(QuestionnaireAnswer, on_delete=models.CASCADE, null=True)
+    question = models.ForeignKey(AbstractQuestion, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return "%s - Answer" % self.question.question_text
+
+    class Meta:
+        abstract = True
+
+
+class TextQuestionAnswer(AbstractQuestionAnswer):
+    question = models.ForeignKey(TextQuestion, on_delete=models.CASCADE, null=True)
+    value = models.TextField(null=True)
+
+
+class SingleChoiceQuestionAnswer(AbstractQuestionAnswer):
+    question = models.ForeignKey(SingleChoiceQuestion, on_delete=models.CASCADE, null=True)
+    value = models.TextField(null=True)
+
+
+class MultiChoiceQuestionAnswer(AbstractQuestionAnswer):
+    question = models.ForeignKey(MultiChoiceQuestion, on_delete=models.CASCADE, null=True)
+    value = models.TextField(null=True)
+
+
+class DragScaleQuestionAnswer(AbstractQuestionAnswer):
+    question = models.ForeignKey(DragScaleQuestion, on_delete=models.CASCADE, null=True)
+    value = models.TextField(null=True)
