@@ -61,7 +61,7 @@ class TriggerEventInline(nested_admin.NestedStackedInline):
         ('trigger options based on user activities', {'fields': ['user_activity']}),
 
         ('trigger options based on environment sensors',
-         {'fields': ['light', 'relative_humidity', 'air_pressure', 'linear_acceleration', 'proximity']})
+         {'fields': ['light', 'relative_humidity', 'air_pressure', 'proximity']})
     ]
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
     extra = 0
@@ -102,7 +102,7 @@ class StudyAdmin(nested_admin.NestedModelAdmin):
             return True
         return obj.owner == request.user
 
-    # override to set object level change permission
+    # override to set object level delete permission
     def has_delete_permission(self, request, obj=None):
         if obj is None:
             return True

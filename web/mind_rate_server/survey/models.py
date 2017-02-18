@@ -94,8 +94,6 @@ class TriggerEvent(models.Model):
                                          max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
     air_pressure = models.CharField("(Optional) Air pressure",
                                     max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
-    linear_acceleration = models.CharField("(Optional) Linear acceleration",
-                                           max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
     proximity = models.CharField("(Optional) Proximity (distance)",
                                  max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
 
