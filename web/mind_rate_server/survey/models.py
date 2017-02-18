@@ -15,6 +15,13 @@ class Study(models.Model):
         verbose_name_plural = "studies"
 
 
+class ProbandInfoQuestionnaire(models.Model):
+    study = models.OneToOneField(Study, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return "%s proband info questionnaire" % self.study.name
+
+
 class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
     name = models.CharField("Questionnaire name", max_length=30)
@@ -102,7 +109,10 @@ class TriggerEvent(models.Model):
 
 
 class AbstractQuestion(models.Model):
+    # belongs to either a normal questionnaire or a proband info questionnaire
     questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE, null=True)
+    proband_info_questionnaire = models.ForeignKey(ProbandInfoQuestionnaire, on_delete=models.CASCADE, null=True)
+
     question_text = models.CharField(max_length=200, null=True)
     show_by_default = models.BooleanField("Show by default (False if the question is hidden by default, and will only "
                                           "be showed to proband if it is triggered as a follow up question)",

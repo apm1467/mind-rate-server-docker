@@ -1,7 +1,7 @@
 from django.contrib import admin
 import nested_admin
 from .models import Questionnaire, Study, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
-    DragScaleQuestion, TriggerEvent, ChoiceOption
+    DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire
 from django.contrib.auth.models import User
 
 
@@ -73,7 +73,12 @@ class QuestionnaireInline(nested_admin.NestedStackedInline):
                MultiChoiceQuestionInline, DragScaleQuestionInline]
     fields = ['name', 'due_after', 'max_trigger_times_per_day']
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
-    classes = ('grp-collapse grp-open',)
+    extra = 0
+
+
+class ProbandInfoQuestionnaireInline(nested_admin.NestedStackedInline):
+    model = ProbandInfoQuestionnaire
+    inlines = [TextQuestionInline, SingleChoiceQuestionInline, MultiChoiceQuestionInline, DragScaleQuestionInline]
     extra = 0
 
 
@@ -81,7 +86,7 @@ class StudyAdmin(nested_admin.NestedModelAdmin):
     model = Study
     fields = ['name', 'start_date_time', 'end_date_time']  # which fields will be asked
     list_display = ('name', 'start_date_time', 'end_date_time')  # fields displayed on the change list page
-    inlines = [QuestionnaireInline]
+    inlines = [ProbandInfoQuestionnaireInline, QuestionnaireInline]
 
     # override to attach request.user to the object prior to saving
     def save_model(self, request, obj, form, change):
