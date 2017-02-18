@@ -3,21 +3,23 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from mind_rate_server.survey.forms import LoginForm
 from mind_rate_server.survey import views
+from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'', include('mind_rate_server.survey.urls')),
 
-    url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
-
-    # redirect admin logout page
-    url(r'^admin/logout/', auth_views.logout, {'next_page': '/login'}, name='logout'),
-
-    url(r'^admin/', admin.site.urls),
+    url(r'^grappelli/', include('grappelli.urls')),
 
     url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html',
                                         'authentication_form': LoginForm}, name='login'),
 
-    url(r'^logout/$', auth_views.logout, {'next_page': '/login'}, name='logout'),
+    # send user to /login after logged out
+    url(r'^admin/logout/', auth_views.logout, {'next_page': '/login'}, name='logout'),
+
+    # redirect admin/login to /login
+    url(r'^admin/login/', RedirectView.as_view(pattern_name='login', permanent=True)),
+
+    url(r'^admin/', admin.site.urls),
 
     url(r'^accounts/', include('registration.backends.hmac.urls')),
 
