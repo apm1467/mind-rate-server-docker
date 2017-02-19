@@ -19,7 +19,7 @@ class ProbandInfoQuestionnaire(models.Model):
     study = models.OneToOneField(Study, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return "%s proband info questionnaire" % self.study.name
+        return self.study.name
 
 
 class Questionnaire(models.Model):
@@ -28,8 +28,7 @@ class Questionnaire(models.Model):
     due_after = models.DurationField(
         "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format",
         null=True, blank=True)
-    max_trigger_times_per_day = models.PositiveIntegerField(
-        "Maximal trigger times per day", null=True)
+    max_trigger_times_per_day = models.PositiveIntegerField("Maximal trigger times per day", default=50)
 
     def __str__(self):
         return self.name
@@ -41,13 +40,11 @@ class Questionnaire(models.Model):
 class TriggerEvent(models.Model):
     questionnaire = models.OneToOneField(Questionnaire, on_delete=models.CASCADE, null=True)
     min_time_space = models.DurationField(
-        "Minimal time space between two trigger events; in [HH:[MM:]]ss format", null=True)
+        "Minimal time space between two trigger events; in [HH:[MM:]]ss format", null=True, default="10:00")
 
     # trigger options based on time
-    datetime = models.DateTimeField("(Optional) A specific date and time",
-                                    null=True, blank=True)
-    time = models.TimeField("(Optional) A specific time everyday",
-                            null=True, blank=True)
+    datetime = models.DateTimeField("(Optional) A specific date and time", null=True, blank=True)
+    time = models.TimeField("(Optional) A specific time everyday", null=True, blank=True)
 
     # trigger options that return Boolean values
     triggeredWhenCalendarEventBegins = models.BooleanField("Triggered when a calendar event begins",
@@ -105,7 +102,7 @@ class TriggerEvent(models.Model):
                                  max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
 
     def __str__(self):
-        return "%s trigger event" % self.questionnaire.name
+        return "%s's trigger event" % self.questionnaire.name
 
 
 class AbstractQuestion(models.Model):
@@ -150,7 +147,11 @@ class ChoiceOption(models.Model):
     multi_choice_question = models.ForeignKey(MultiChoiceQuestion, on_delete=models.CASCADE, null=True)
 
     choice_text = models.CharField(max_length=200)
-    next_question_position = models.PositiveSmallIntegerField("Actual position of the follow up question", null=True)
+    next_question_position = models.PositiveSmallIntegerField("Actual position of the follow up question",
+                                                              null=True, blank=True)
+
+    def __str__(self):
+        return self.choice_text
 
 
 class Proband(models.Model):

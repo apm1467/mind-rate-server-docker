@@ -53,7 +53,7 @@ class TriggerEventInline(nested_admin.NestedStackedInline):
 
         ('trigger options based on time', {'fields': ['datetime', 'time']}),
 
-        ('trigger options based on calender, calls or notifications',
+        ('trigger options based on calender, SMS, calls or notifications',
          {'fields': ['triggeredWhenCalendarEventBegins', 'triggeredWhenCalendarEventEnds',
                      'triggeredWhenFacebookNotificationComes', 'triggeredWhenWhatsAppNotificationComes',
                      'triggeredWhenSmsComes', 'triggeredWhenPhoneCallEnds']}),
@@ -65,6 +65,8 @@ class TriggerEventInline(nested_admin.NestedStackedInline):
     ]
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
     extra = 0
+    min_num = 1
+    max_num = 1
 
 
 class QuestionnaireInline(nested_admin.NestedStackedInline):
@@ -74,12 +76,14 @@ class QuestionnaireInline(nested_admin.NestedStackedInline):
     fields = ['name', 'due_after', 'max_trigger_times_per_day']
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
     extra = 0
+    min_num = 1
 
 
 class ProbandInfoQuestionnaireInline(nested_admin.NestedStackedInline):
     model = ProbandInfoQuestionnaire
     inlines = [TextQuestionInline, SingleChoiceQuestionInline, MultiChoiceQuestionInline, DragScaleQuestionInline]
     extra = 0
+    max_num = 1
 
 
 class StudyAdmin(nested_admin.NestedModelAdmin):
@@ -100,22 +104,6 @@ class StudyAdmin(nested_admin.NestedModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(owner=request.user)
-
-    # override to set object level change permission
-    def has_change_permission(self, request, obj=None):
-        if obj is None:
-            return True
-        return obj.owner == request.user
-
-    # override to set object level delete permission
-    def has_delete_permission(self, request, obj=None):
-        if obj is None:
-            return True
-        return obj.owner == request.user
-
-    # override to always allow access to the module's index page
-    def has_module_permission(self, request):
-        return True
 
 
 admin.site.register(Study, StudyAdmin)
