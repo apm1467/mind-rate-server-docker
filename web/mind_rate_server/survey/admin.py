@@ -26,8 +26,8 @@ class SingleChoiceQuestionInline(nested_admin.NestedStackedInline):
     model = SingleChoiceQuestion
     fields = ['show_by_default', 'question_text', 'position']
     inlines = [ChoiceOptionInline]
-    classes = ('grp-collapse grp-open',)
     sortable_field_name = 'position'
+    sortable_excludes = ('show_by_default', 'question_text', 'position')
     extra = 0
 
 
@@ -36,6 +36,7 @@ class MultiChoiceQuestionInline(nested_admin.NestedStackedInline):
     fields = ['show_by_default', 'question_text', 'position']
     inlines = [ChoiceOptionInline]
     sortable_field_name = 'position'
+    sortable_excludes = ('show_by_default', 'question_text', 'position')
     extra = 0
 
 
@@ -43,6 +44,7 @@ class DragScaleQuestionInline(nested_admin.NestedStackedInline):
     model = DragScaleQuestion
     fields = ['show_by_default', 'question_text', 'min_value', 'max_value', 'position']
     sortable_field_name = 'position'
+    sortable_excludes = ('show_by_default', 'question_text', 'min_value', 'max_value', 'position')
     extra = 0
 
 

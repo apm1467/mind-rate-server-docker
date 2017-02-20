@@ -9,7 +9,7 @@ class Study(models.Model):
     end_date_time = models.DateTimeField("End time")
 
     def __str__(self):
-        return self.name
+        return "%s - ID: %d" % (self.name, self.id)
 
     class Meta:
         verbose_name_plural = "studies"
@@ -19,7 +19,7 @@ class ProbandInfoQuestionnaire(models.Model):
     study = models.OneToOneField(Study, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.study.name
+        return "%s's proband info questionnaire" % self.study.name
 
 
 class Questionnaire(models.Model):
@@ -27,7 +27,7 @@ class Questionnaire(models.Model):
     name = models.CharField("Questionnaire name", max_length=30)
     due_after = models.DurationField(
         "(Optional) Valid time duration after triggered; in [HH:[MM:]]ss format",
-        null=True, blank=True)
+        null=True, blank=True, default="24:00:00")
     max_trigger_times_per_day = models.PositiveIntegerField("Maximal trigger times per day", default=50)
 
     def __str__(self):
@@ -143,15 +143,17 @@ class MultiChoiceQuestion(AbstractQuestion):
 
 class ChoiceOption(models.Model):
     # this class is part of either a single or a multi question
-    single_choice_question = models.ForeignKey(SingleChoiceQuestion, on_delete=models.CASCADE, null=True)
-    multi_choice_question = models.ForeignKey(MultiChoiceQuestion, on_delete=models.CASCADE, null=True)
+    single_choice_question = models.ForeignKey(SingleChoiceQuestion, on_delete=models.DO_NOTHING, null=True)
+    multi_choice_question = models.ForeignKey(MultiChoiceQuestion, on_delete=models.DO_NOTHING, null=True)
 
     # dirty hack as a work-around of the Grappelli drag-drop sorting bug
-    text_question = models.ForeignKey(TextQuestion, on_delete=models.CASCADE, null=True)
-    drag_scale_question = models.ForeignKey(DragScaleQuestion, on_delete=models.CASCADE, null=True)
+    # choice options can also be appended to a text or drag scale question;
+    # they will then be seen as single choices questions
+    text_question = models.ForeignKey(TextQuestion, on_delete=models.DO_NOTHING, null=True)
+    drag_scale_question = models.ForeignKey(DragScaleQuestion, on_delete=models.DO_NOTHING, null=True)
 
     choice_text = models.CharField(max_length=200)
-    next_question_position = models.PositiveSmallIntegerField("Actual position of the follow up question",
+    next_question_position = models.PositiveSmallIntegerField("(Optional) Position of the follow up question",
                                                               null=True, blank=True)
 
     def belongs_to_single_choice_question(self):
@@ -167,6 +169,9 @@ class ChoiceOption(models.Model):
 
 class Proband(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.id
 
 
 # simulation of a dictionary-like key-value pair for Proband
