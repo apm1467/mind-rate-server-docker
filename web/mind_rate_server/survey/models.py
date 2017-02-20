@@ -26,7 +26,7 @@ class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
     name = models.CharField("Questionnaire name", max_length=30)
     due_after = models.DurationField(
-        "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format",
+        "(Optional) Valid time duration after triggered; in [HH:[MM:]]ss format",
         null=True, blank=True)
     max_trigger_times_per_day = models.PositiveIntegerField("Maximal trigger times per day", default=50)
 
@@ -146,9 +146,20 @@ class ChoiceOption(models.Model):
     single_choice_question = models.ForeignKey(SingleChoiceQuestion, on_delete=models.CASCADE, null=True)
     multi_choice_question = models.ForeignKey(MultiChoiceQuestion, on_delete=models.CASCADE, null=True)
 
+    # dirty hack as a work-around of the Grappelli drag-drop sorting bug
+    text_question = models.ForeignKey(TextQuestion, on_delete=models.CASCADE, null=True)
+    drag_scale_question = models.ForeignKey(DragScaleQuestion, on_delete=models.CASCADE, null=True)
+
     choice_text = models.CharField(max_length=200)
     next_question_position = models.PositiveSmallIntegerField("Actual position of the follow up question",
                                                               null=True, blank=True)
+
+    def belongs_to_single_choice_question(self):
+        # exclude MultiChoiceQuestion
+        if self.multi_choice_question is not None:
+            return False
+        else:
+            return True
 
     def __str__(self):
         return self.choice_text

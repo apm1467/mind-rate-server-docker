@@ -1,9 +1,10 @@
-from django.core import serializers
-from .models import Study, Questionnaire, TriggerEvent
-from django.shortcuts import render, get_object_or_404, redirect, get_list_or_404
+from .models import Questionnaire, Study, Proband, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
+    DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
 
 
 # give user permissions and redirect user to the admin site
@@ -34,28 +35,198 @@ def view_answers(request, study_id):
     return render(request, 'view_answers.html', {"study": study, "user": user})
 
 
+def _get_question_list(questionnaire):
+    question_list = []
+
+    question_list.extend(TextQuestion.objects.filter(questionnaire=questionnaire))
+    question_list.extend(DragScaleQuestion.objects.filter(questionnaire=questionnaire))
+    question_list.extend(SingleChoiceQuestion.objects.filter(questionnaire=questionnaire))
+    question_list.extend(MultiChoiceQuestion.objects.filter(questionnaire=questionnaire))
+
+    question_list.sort(key=lambda question: question.position)
+    return question_list
+
+
+def _get_question_list_json(questionnaire):
+    question_list = _get_question_list(questionnaire)
+    json = "\"questions\": ["
+
+    for question in question_list:
+        option_list = []
+        option_list.extend(ChoiceOption.objects.filter(single_choice_question=question))
+        option_list.extend(ChoiceOption.objects.filter(multi_choice_question=question))
+        option_list.extend(ChoiceOption.objects.filter(text_question=question))
+        option_list.extend(ChoiceOption.objects.filter(drag_scale_question=question))
+
+        if len(option_list) != 0:  # the question must be a choice question
+            has_choice = True
+            if isinstance(question, MultiChoiceQuestion):
+                question_type = "MultipleChoice"
+            else:
+                question_type = "SingleChoice"
+        else:
+            has_choice = False
+            if isinstance(question, TextQuestion):
+                question_type = "TextAnswer"
+            else:
+                question_type = "DragScale"
+
+        if question.show_by_default:
+            show_by_default = "true"
+        else:
+            show_by_default = "false"
+
+        json += "{" \
+                "\"questionID\": \"%d\"," \
+                "\"questionType\": \"%s\"," \
+                "\"questionContent\": \"%s\"," \
+                "\"showByDefault\": \"%s\"," \
+                % question.id, question_type, question.question_text, show_by_default
+
+        if has_choice:
+            json += "\"options\": ["
+            for option in option_list:
+
+                # get next question id from next question position
+                next_question_id = None
+                for q in question_list:
+                    if q.position == option.next_question_position:
+                        next_question_id = q.id
+                        break
+
+                json += "{\"optionContent\": \"%s\", \"nextQuestionID\": \"%d\"}," \
+                        % question.question_text, next_question_id
+            json += "]"
+
+        json += "},"
+    json += "],"
+
+
 # For app to download studies
-# def view_download(request, study_id):
-#     study = get_object_or_404(Study, pk=study_id)
-#     study_in_json_str = serializers.serialize('json', [study, ])
-#     questionnaire_list = get_list_or_404(Questionnaire, study_id=study.id)
-#     questionnaire_in_json_str = ""
-#     for questionnaire in questionnaire_list:
-#         questionnaire_in_json_str += serializers.serialize('json', [questionnaire, ])
-#     all_question_list = []
-#     all_trigger_event_list = []
-#     for questionnaire in questionnaire_list:
-#         all_question_list.extend(get_list_or_404(Question, questionnaire_id=questionnaire.id))
-#         all_trigger_event_list.extend(get_list_or_404(TriggerEvent, questionnaire_id=questionnaire.id))
-#     all_question_in_json_str = ""
-#     all_trigger_event_in_json_str = ""
-#     for question in all_question_list:
-#         all_question_in_json_str += serializers.serialize('json', [question, ])
-#     for trigger_event in all_trigger_event_list:
-#         all_trigger_event_in_json_str += serializers.serialize('json', [trigger_event, ])
-#     return render(request, 'view_download.html',
-#                   {"study": study_in_json_str, "questionnaires": questionnaire_in_json_str,
-#                    "questions": all_question_in_json_str, "trigger_events": all_trigger_event_in_json_str})
+def download(request, study_id):
+    study = get_object_or_404(Study, id=study_id)
+    proband = Proband.objects.create(study=study)
+    proband_info_questionnaire = ProbandInfoQuestionnaire.objects.get_or_create(study=study)
+    questionnaire_list = Questionnaire.objects.filter(study=study)
+    trigger_event = TriggerEvent.objects.get(study=study)
+
+    start_time = study.start_date_time
+    end_time = study.end_date_time
+
+    json = "{" \
+           "\"study\": {" \
+           "\"probandID\": %d," \
+           "\"studyId\": %d," \
+           "\"studyName\": %s," \
+           "\"beginningDate\": {" \
+           "\"year\": %d," \
+           "\"month\": %d," \
+           "\"day\": %d," \
+           "\"hour\": %d," \
+           "\"minute\": %d," \
+           "\"second\": %d," \
+           "}," \
+           "\"endDate\": {" \
+           "\"year\": %d," \
+           "\"month\": %d," \
+           "\"day\": %d," \
+           "\"hour\": %d," \
+           "\"minute\": %d," \
+           "\"second\": %d," \
+           "}," \
+           % proband.id, study.id, study.name, start_time.year, start_time.month, start_time.day, \
+           start_time.hour, start_time.minute, start_time.second, study.end_date_time.year, end_time.month,\
+           end_time.day, end_time.hour, end_time.minute, end_time.second
+
+    # proband info questionnaire
+    json += "\"probandInfoQuestionnaire\": {"
+    json += _get_question_list_json(proband_info_questionnaire)
+    json += "},"
+
+    # normal questionnaires
+    json += "\"questionnaires\": ["
+    for questionnaire in questionnaire_list:
+
+        # basic info of questionnaire
+        if questionnaire.due_after is None:
+            duration = 999999999
+        else:
+            duration = questionnaire.due_after.total_seconds()
+
+        json += "{" \
+                "\"questionnaireID\": \"%d\"," \
+                "\"questionnaireName\": \"%s\"," \
+                "\"maxShowUpTimesPerDay\": %d," \
+                "\"duration\": {" \
+                "\"second\": %d," \
+                "}," \
+                % questionnaire.id, questionnaire.name, questionnaire.max_trigger_times_per_day, duration
+
+        # trigger event of questionnaire
+        if trigger_event.datetime is None:
+            datetime = "null"
+        else:
+            datetime = "{" \
+                       "\"year\": %d," \
+                       "\"month\": %d," \
+                       "\"day\": %d," \
+                       "\"hour\": %d," \
+                       "\"minute\": %d," \
+                       "\"second\": %d," \
+                       "}" \
+                       % trigger_event.datetime.year, trigger_event.datetime.month, trigger_event.datetime.day, \
+                       trigger_event.datetime.hour, trigger_event.datetime.minute, trigger_event.datetime.second
+        if trigger_event.time is None:
+            time = "null"
+        else:
+            time = "%d-%d-%d" % trigger_event.time.hour, trigger_event.time.minute, trigger_event.time.second
+
+        json += "\"triggerEvent\": {" \
+                "\"minTimeSpace\": %d," \
+                "\"datetime\": \"%s\"," \
+                "\"time\": \"%s\"," % trigger_event.min_time_space.total_seconds(), datetime, time
+
+        if trigger_event.light is not None:
+            json += "\"light\": true," \
+                    "\"lightMinValue\": 0," \
+                    "\"lightMaxValue\": 0,"
+        else:
+            json += "\"light\": false,"
+
+        if trigger_event.relative_humidity is not None:
+            json += "\"relativeHumidity\": true," \
+                    "\"relativeHumidityMinValue\": 0," \
+                    "\"relativeHumidityMaxValue\": 0,"
+        else:
+            json += "\"relativeHumidity\": false,"
+
+        if trigger_event.air_pressure is not None:
+            json += "\"pressure\": true," \
+                    "\"pressureMinValue\": 0," \
+                    "\"pressureMaxValue\": 0,"
+        else:
+            json += "\"pressure\": false,"
+
+        if trigger_event.proximity is not None:
+            json += "\"proximity\": true," \
+                    "\"proximityMinValue\": 0," \
+                    "\"proximityMaxValue\": 0,"
+        else:
+            json += "\"proximity\": false,"
+        json += "},"
+
+        # questions of the questionnaire
+        json += "\"questions\": ["
+        json += _get_question_list_json(questionnaire)
+
+        # end of a questionnaire
+        json += "},"
+
+    json += "]"  # end of all questionnaires
+    json += "}"  # end of study
+    json += "]"  # end of json
+
+    return HttpResponse(json, content_type="application/json")
 #
 #
 # def preview(request, questionnaire_id):
