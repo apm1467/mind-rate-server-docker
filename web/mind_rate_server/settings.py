@@ -127,3 +127,5 @@ EMAIL_HOST_USER = 'ran.moe.yige.ch@gmail.com'
 EMAIL_HOST_PASSWORD = 'oVR-yCX-6Rq-wU4'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+GRAPPELLI_ADMIN_TITLE = 'Mind Rate'
