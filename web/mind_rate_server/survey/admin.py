@@ -63,7 +63,7 @@ class TriggerEventInline(nested_admin.NestedStackedInline):
         ('trigger options based on user activities', {'fields': ['user_activity']}),
 
         ('trigger options based on environment sensors',
-         {'fields': ['light', 'temperature' 'relative_humidity', 'air_pressure', 'proximity']})
+         {'fields': ['light', 'temperature', 'relative_humidity', 'air_pressure', 'proximity']})
     ]
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
     extra = 0
