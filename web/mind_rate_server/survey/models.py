@@ -85,15 +85,19 @@ class TriggerEvent(models.Model):
     MEDIUM = "M"
     LOW = "L"
     VERY_LOW = "VL"
+    AlWAYS = "AL"
     SENSOR_LEVEL_CHOICES = (
         (VERY_HIGH, "very high"),
         (HIGH, "high"),
         (MEDIUM, "medium"),
         (LOW, "low"),
-        (VERY_LOW, "very low")
+        (VERY_LOW, "very low"),
+        (AlWAYS, "all conditions")
     )
     light = models.CharField("(Optional) Light",
                              max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
+    temperature = models.CharField("(Optional) Temperature",
+                                   max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
     relative_humidity = models.CharField("(Optional) Relative humidity",
                                          max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
     air_pressure = models.CharField("(Optional) Air pressure",

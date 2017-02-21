@@ -213,9 +213,27 @@ def download(request, study_id):
                 "\"time\": %s," % (trigger_event.min_time_space.total_seconds(), datetime, time)
 
         if trigger_event.light is not None:
+            if trigger_event.light == "VL":
+                min_light = 0
+                max_light = 4
+            elif trigger_event.light == "L":
+                min_light = 0
+                max_light = 50
+            elif trigger_event.light == "M":
+                min_light = 50
+                max_light = 400
+            elif trigger_event.light == "H":
+                min_light = 400
+                max_light = 40000
+            elif trigger_event.light == "VH":
+                min_light = 1000
+                max_light = 40000
+            else:
+                min_light = 0
+                max_light = 40000
             json += "\"light\": true," \
-                    "\"lightMinValue\": 0," \
-                    "\"lightMaxValue\": 0,"
+                    "\"lightMinValue\": %d," \
+                    "\"lightMaxValue\": %d," % (min_light, max_light)
         else:
             json += "\"light\": false,"
 
@@ -225,6 +243,13 @@ def download(request, study_id):
                     "\"relativeHumidityMaxValue\": 0,"
         else:
             json += "\"relativeHumidity\": false,"
+
+        if trigger_event.temperature is not None:
+            json += "\"ambientTemperature\": true," \
+                    "\"ambientTemperatureMinValue\": 0," \
+                    "\"ambientTemperatureMaxValue\": 0,"
+        else:
+            json += "\"ambientTemperature\": false,"
 
         if trigger_event.air_pressure is not None:
             json += "\"pressure\": true," \
