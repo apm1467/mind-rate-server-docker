@@ -91,3 +91,10 @@ ENV/
 /web/db.sqlite3
 .idea/
 /web/mind_rate_server/survey/migrations
+/web/.idea/inspectionProfiles/profiles_settings.xml
+/web/mind_rate_server/survey/migrations/0001_initial.py
+/web/mind_rate_server/survey/migrations/__init__.py
+/web/.idea/workspace.xml
+/web/.idea/web.iml
+/web/.idea/modules.xml
+/web/.idea/misc.xml
