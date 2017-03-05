@@ -8,18 +8,25 @@
 <div style="background-color:#E6E6E6;color:black;padding:20px;">
   <ul style="list-style-type:none">
     {% for question in question_list %}
-      <li>Q{{ forloop.counter }}: {{ question.question_content }}</li>
-      {% if question.question_type == choice_question_list %}
+        <li>Q{{ question.position }}(Show by Default: {{ question.show_by_default }}): {{ question.question_text }}</li>
 
-        {{ question.option }}
+        <ul style="list-style-type:none">
 
-      {% elif question in scale_question_list %}
-      <ul style="list-style-type:none">
-        <li>Minimum: {{ question.min_value }}</li>
-        <li>Maximum: {{ question.max_value }}</li>
-        <li>Gap: {{ question.gap_value }}</li>
-      </ul>
-      {% endif %}
+        {% if question in questionnaire.textquestion_set.all %}
+
+        {% elif question in questionnaire.dragscalequestion_set.all %}
+            <li>Minimum: {{ question.min_value }}</li>
+            <li>Maximum: {{ question.max_value }}</li>
+
+        {% else %}
+        {# single or multi choice question #}
+            {% for choice in question.choiceoption_set.all %}
+            <li>{{ choice.choice_text }}
+              {% if choice.next_question_position %}(Follow up question: {{next_question_position}}){% endif %}
+            </li>
+            {% endfor %}
+        {% endif %}
+        </ul>
       <p>
     {% endfor %}
   </ul>

@@ -278,9 +278,9 @@ def download(request, study_id):
     json += "}"  # end of json
 
     return HttpResponse(json, content_type="application/json")
-#
-#
-# def preview(request, questionnaire_id):
-#     questionnaire = get_object_or_404(Questionnaire, pk=questionnaire_id)
-#     all_question_list = get_list_or_404(Question, questionnaire_id=questionnaire.id)
-#     return render(request, 'preview.html', {"questionnaire": questionnaire, "question_list": all_question_list})
+
+
+def preview(request, questionnaire_id):
+    questionnaire = get_object_or_404(Questionnaire, pk=questionnaire_id)
+    all_question_list = _get_question_list_from_questionnaire(questionnaire)
+    return render(request, 'preview.html', {"questionnaire": questionnaire, "question_list": all_question_list})

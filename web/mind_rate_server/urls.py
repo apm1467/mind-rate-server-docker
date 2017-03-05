@@ -28,7 +28,7 @@ urlpatterns = [
     # To define a study-downloading url
     url(r'^download/(?P<study_id>[0-9]+)/$', views.download, name='download'),
 
-    # url(r'^preview/(?P<questionnaire_id>\d+)/$', views.preview, name='preview'),
+    url(r'^preview/(?P<questionnaire_id>\d+)/$', views.preview, name='preview'),
 
     url(r'^_nested_admin/', include('nested_admin.urls')),
 ]
