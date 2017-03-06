@@ -203,7 +203,6 @@ class SensorValueCell(models.Model):
 
 class AbstractQuestionAnswer(models.Model):
     questionnaire_answer = models.ForeignKey(QuestionnaireAnswer, on_delete=models.CASCADE, null=True)
-    question = models.ForeignKey(AbstractQuestion, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return "%s - Answer" % self.question.question_text

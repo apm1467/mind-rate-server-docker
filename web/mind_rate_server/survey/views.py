@@ -20,11 +20,8 @@ def home(request):
 
     # give user all permissions of the survey app
     content_type_list = ContentType.objects.filter(app_label='survey')
-
     for content_type in content_type_list:
-        user.user_permissions.add(
-            *Permission.objects.filter(content_type=content_type)
-        )
+        user.user_permissions.add(*Permission.objects.filter(content_type=content_type))
 
     user.save()
 
