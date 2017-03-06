@@ -1,10 +1,13 @@
 from .models import Questionnaire, Study, Proband, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
-    DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire
+    DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire, ProbandInfoCell, QuestionnaireAnswer, \
+    SensorValueCell, TextQuestionAnswer, SingleChoiceQuestionAnswer, MultiChoiceQuestionAnswer, DragScaleQuestionAnswer
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
+import json
+import datetime
 
 
 # give user permissions and redirect user to the admin site
@@ -278,6 +281,56 @@ def download(request, study_id):
     json_data += "}"  # end of json
 
     return HttpResponse(json_data, content_type="application/json")
+
+
+def receive_answer(request):
+    json_data = json.loads(request.body)
+
+    proband = get_object_or_404(Proband, id=json_data['probandID'])
+
+    # store proband info
+    for key, value in json_data['probandInfoAnswer'].items():
+        ProbandInfoCell.objects.create(proband=proband, key=key, value=value)
+
+    # store questionnaire answer
+    for questionnaire_item in json_data['questionnaireAnswerList']:
+        questionnaire = get_object_or_404(Questionnaire, id=questionnaire_item['questionnaireID'])
+        
+        submit_time_dict = questionnaire_item['submitTime']
+        submit_time = datetime.datetime(submit_time_dict['year'], submit_time_dict['month'],
+                                        submit_time_dict['day'], submit_time_dict['hour'],
+                                        submit_time_dict['minute'], submit_time_dict['second'])
+        
+        questionnaire_answer = QuestionnaireAnswer.objects.create(questionnaire=questionnaire, submitter=proband,
+                                                                  submit_time=submit_time)
+        
+        # store sensor values of the questionnaire answer
+        for key, value in questionnaire_item['sensorValues']:
+            SensorValueCell.objects.create(questionnaire_answer=questionnaire_answer, key=key, value=value)
+
+        # store answers of each question
+        for question_item in questionnaire_item['questionAnswer']:
+
+            question_type = question_item['questionType']
+
+            if question_type == 'SingleChoice':
+                question = get_object_or_404(SingleChoiceQuestion, id=question_item['questionID'])
+                SingleChoiceQuestionAnswer.objects.create(question=question, value=question_item['answer'],
+                                                          questionnaire_answer=questionnaire_answer)
+            elif question_type == 'TextAnswer':
+                question = get_object_or_404(TextQuestion, id=question_item['questionID'])
+                TextQuestionAnswer.objects.create(question=question, value=question_item['answer'],
+                                                  questionnaire_answer=questionnaire_answer)
+            elif question_type == 'DragScale':
+                question = get_object_or_404(DragScaleQuestion, id=question_item['questionID'])
+                DragScaleQuestionAnswer.objects.create(question=question, value=question_item['answer'],
+                                                       questionnaire_answer=questionnaire_answer)
+            elif question_type == 'MultipleChoice':
+                question = get_object_or_404(MultiChoiceQuestion, id=question_item['questionID'])
+                MultiChoiceQuestionAnswer.objects.create(question=question, value=question_item['answer'],
+                                                         questionnaire_answer=questionnaire_answer)
+
+    return HttpResponse("OK")
 
 
 def preview(request, questionnaire_id):

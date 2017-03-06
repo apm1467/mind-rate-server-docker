@@ -25,8 +25,11 @@ urlpatterns = [
 
     url(r'^study/(?P<study_id>\d+)/$', views.view_answers, name='view_answers'),
 
-    # To define a study-downloading url
+    # download study to app
     url(r'^download/(?P<study_id>[0-9]+)/$', views.download, name='download'),
+
+    # receive answer from app
+    url(r'^receive_answer/', views.receive_answer, name='receive_answer'),
 
     url(r'^preview/(?P<questionnaire_id>\d+)/$', views.preview, name='preview'),
 
