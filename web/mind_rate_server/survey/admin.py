@@ -2,7 +2,8 @@ from django.contrib import admin
 import nested_admin
 from .models import Questionnaire, Study, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
     DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire, QuestionnaireAnswer,\
-    TextQuestionAnswer, SingleChoiceQuestionAnswer, MultiChoiceQuestionAnswer, DragScaleQuestionAnswer
+    TextQuestionAnswer, SingleChoiceQuestionAnswer, MultiChoiceQuestionAnswer, DragScaleQuestionAnswer,\
+    SensorValueCell
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 import csv
@@ -97,7 +98,7 @@ def export_csv(modeladmin, request, queryset):
     response['Content-Disposition'] = 'attachment; filename="study_data.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Study ID', 'Questionnaire ID', 'Question ID', 'Answer', 'Submit Time'])
+    writer.writerow(['Study ID', 'Questionnaire ID', 'Question ID', 'Answer', 'Submit Time', 'Sensor value'])
 
     for study in queryset:
         questionnaire_list = Questionnaire.objects.filter(study=study)
@@ -106,8 +107,17 @@ def export_csv(modeladmin, request, queryset):
             questionnaire_answer_list = QuestionnaireAnswer.objects.filter(questionnaire=questionnaire)
 
             for questionnaire_answer in questionnaire_answer_list:
-                question_answer_list = []
 
+                # write all sensor values into a string
+                sensor_value = ""
+
+                sensor_value_cell_list = SensorValueCell.objects.filter(questionnaire_answer=questionnaire_answer)
+                for sensor_value_cell in sensor_value_cell_list:
+                    sensor_value += "%s: %s / " % (sensor_value_cell.key, sensor_value_cell.value)
+                    sensor_value = sensor_value[:-3]  # remove the trailing slash
+
+                # add all question answers of the questionnaire answer into a list
+                question_answer_list = []
                 question_answer_list.extend(TextQuestionAnswer.objects.filter(
                     questionnaire_answer=questionnaire_answer))
                 question_answer_list.extend(SingleChoiceQuestionAnswer.objects.filter(
@@ -120,10 +130,12 @@ def export_csv(modeladmin, request, queryset):
                 # sort the question answer list based on submit time
                 question_answer_list.sort(key=lambda item: item.questionnaire_answer.submit_time)
 
+                # write all values into a csv row
                 for question_answer in question_answer_list:
                     writer.writerow([
                         study.id, questionnaire.id, question_answer.question.id,
-                        question_answer.value, question_answer.questionnaire_answer.submit_time
+                        question_answer.value, question_answer.questionnaire_answer.submit_time,
+                        sensor_value
                     ])
 
     return response
