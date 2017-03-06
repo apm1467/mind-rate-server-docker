@@ -98,11 +98,11 @@ def _get_question_list_json(question_list):
 
         # display question type specific data
         json_data += "\"questionType\": {" \
-                     "\"typeName\": \"%s\"," % question_type
+                     "\"typeName\": \"%s\"" % question_type
 
         # display options for choice question
         if question_type == "MultipleChoice" or question_type == "SingleChoice":
-            json_data += "\"options\": ["
+            json_data += ", \"options\": ["
             for option in option_list:
 
                 # get next question id from next question position
@@ -115,16 +115,18 @@ def _get_question_list_json(question_list):
                 json_data += "{\"optionContent\": \"%s\", \"nextQuestionID\": \"%s\"}," \
                              % (option.choice_text, next_question_id)
 
+            json_data = json_data[:-1]  # remove the trailing comma
             json_data += "]"  # end of all options
 
         # display drag interval for drag scale question
         elif question_type == "DragScale":
-            json_data += "\"maxValue\""": %d," % question.max_value
+            json_data += ", \"maxValue\""": %d" % question.max_value
 
         json_data += "}"  # end of question type
         json_data += "},"  # end of a question
 
-    json_data += "],"   # end of all questions
+    json_data = json_data[:-1]  # remove the trailing comma
+    json_data += "]"   # end of all questions
     return json_data
 
 
@@ -178,7 +180,7 @@ def download(request, study_id):
                 "\"day\": %d," \
                 "\"hour\": %d," \
                 "\"minute\": %d," \
-                "\"second\": %d," \
+                "\"second\": %d" \
                 "}," \
                 "\"endDate\": {" \
                 "\"year\": %d," \
@@ -186,7 +188,7 @@ def download(request, study_id):
                 "\"day\": %d," \
                 "\"hour\": %d," \
                 "\"minute\": %d," \
-                "\"second\": %d," \
+                "\"second\": %d" \
                 "}," \
                 % (proband.id, study.id, study.name, start_time.year, start_time.month, start_time.day,
                    start_time.hour, start_time.minute, start_time.second, study.end_date_time.year, end_time.month,
@@ -214,7 +216,7 @@ def download(request, study_id):
                      "\"questionnaireName\": \"%s\"," \
                      "\"maxShowUpTimesPerDay\": %d," \
                      "\"duration\": {" \
-                     "\"second\": %d," \
+                     "\"second\": %d" \
                      "}," \
                      % (questionnaire.id, questionnaire.name, questionnaire.max_trigger_times_per_day, duration)
 
@@ -291,9 +293,9 @@ def download(request, study_id):
         if trigger_event.proximity is not None:
             json_data += "\"proximity\": true," \
                          "\"proximityMinValue\": 0," \
-                         "\"proximityMaxValue\": 0,"
+                         "\"proximityMaxValue\": 0"
         else:
-            json_data += "\"proximity\": false,"
+            json_data += "\"proximity\": false"
         json_data += "},"
 
         # questions of the questionnaire
@@ -303,6 +305,7 @@ def download(request, study_id):
 
         json_data += "},"  # end of a questionnaire
 
+    json_data = json_data[:-1]  # remove the trailing comma
     json_data += "]"  # end of all questionnaires
     json_data += "}"  # end of study
     json_data += "}"  # end of json
