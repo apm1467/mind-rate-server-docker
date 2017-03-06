@@ -75,13 +75,11 @@ def _get_question_list_json(question_list):
             option_list.extend(ChoiceOption.objects.filter(drag_scale_question=question))
 
         if len(option_list) != 0:  # the question must be a choice question
-            has_choice = True
             if isinstance(question, MultiChoiceQuestion):
                 question_type = "MultipleChoice"
             else:
                 question_type = "SingleChoice"
-        else:  # the question is no a choice question
-            has_choice = False
+        else:  # the question is not a choice question
             if isinstance(question, TextQuestion):
                 question_type = "TextAnswer"
             else:
@@ -94,13 +92,16 @@ def _get_question_list_json(question_list):
 
         json_data += "{" \
                      "\"questionID\": \"%d\"," \
-                     "\"questionType\": \"%s\"," \
                      "\"questionContent\": \"%s\"," \
                      "\"showByDefault\": %s," \
-                     % (question.id, question_type, question.question_text, show_by_default)
+                     % (question.id, question.question_text, show_by_default)
 
-        # display all options for choice question
-        if has_choice:
+        # display question type specific data
+        json_data += "\"questionType\": {" \
+                     "\"typeName\": \"%s\"," % question_type
+
+        # display options for choice question
+        if question_type == "MultipleChoice" or question_type == "SingleChoice":
             json_data += "\"options\": ["
             for option in option_list:
 
@@ -114,12 +115,13 @@ def _get_question_list_json(question_list):
                 json_data += "{\"optionContent\": \"%s\", \"nextQuestionID\": \"%s\"}," \
                              % (option.choice_text, next_question_id)
 
-            json_data += "]"  # end of all choices
+            json_data += "]"  # end of all options
 
         # display drag interval for drag scale question
-        elif isinstance(question, DragScaleQuestion):
+        elif question_type == "DragScale":
             json_data += "\"maxValue\""": %d," % question.max_value
 
+        json_data += "}"  # end of question type
         json_data += "},"  # end of a question
 
     json_data += "],"   # end of all questions
