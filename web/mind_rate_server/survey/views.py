@@ -60,7 +60,7 @@ def _get_question_list_from_proband_info_questionnaire(proband_info_questionnair
 
 
 def _get_question_list_json(question_list):
-    json = "\"questions\": ["
+    json_data = "\"questions\": ["
 
     for question in question_list:
         option_list = []
@@ -92,16 +92,16 @@ def _get_question_list_json(question_list):
         else:
             show_by_default = "false"
 
-        json += "{" \
-                "\"questionID\": \"%d\"," \
-                "\"questionType\": \"%s\"," \
-                "\"questionContent\": \"%s\"," \
-                "\"showByDefault\": %s," \
-                % (question.id, question_type, question.question_text, show_by_default)
+        json_data += "{" \
+                     "\"questionID\": \"%d\"," \
+                     "\"questionType\": \"%s\"," \
+                     "\"questionContent\": \"%s\"," \
+                     "\"showByDefault\": %s," \
+                     % (question.id, question_type, question.question_text, show_by_default)
 
         # display all options for choice question
         if has_choice:
-            json += "\"options\": ["
+            json_data += "\"options\": ["
             for option in option_list:
 
                 # get next question id from next question position
@@ -111,19 +111,19 @@ def _get_question_list_json(question_list):
                         next_question_id = q.id
                         break
 
-                json += "{\"optionContent\": \"%s\", \"nextQuestionID\": \"%s\"}," \
-                        % (option.choice_text, next_question_id)
+                json_data += "{\"optionContent\": \"%s\", \"nextQuestionID\": \"%s\"}," \
+                             % (option.choice_text, next_question_id)
 
-            json += "]"  # end of all choices
+            json_data += "]"  # end of all choices
 
         # display drag interval for drag scale question
         elif isinstance(question, DragScaleQuestion):
-            json += "\"maxValue\""": %d," % question.max_value
+            json_data += "\"maxValue\""": %d," % question.max_value
 
-        json += "},"  # end of a question
+        json_data += "},"  # end of a question
 
-    json += "],"   # end of all questions
-    return json
+    json_data += "],"   # end of all questions
+    return json_data
 
 
 # For app to download studies
@@ -137,40 +137,40 @@ def download(request, study_id):
     end_time = study.end_date_time
 
     # study basic info
-    json = "{" \
-           "\"study\": {" \
-           "\"probandID\": \"%d\"," \
-           "\"studyId\": \"%d\"," \
-           "\"studyName\": \"%s\"," \
-           "\"beginningDate\": {" \
-           "\"year\": %d," \
-           "\"month\": %d," \
-           "\"day\": %d," \
-           "\"hour\": %d," \
-           "\"minute\": %d," \
-           "\"second\": %d," \
-           "}," \
-           "\"endDate\": {" \
-           "\"year\": %d," \
-           "\"month\": %d," \
-           "\"day\": %d," \
-           "\"hour\": %d," \
-           "\"minute\": %d," \
-           "\"second\": %d," \
-           "}," \
-           % (proband.id, study.id, study.name, start_time.year, start_time.month, start_time.day,
-              start_time.hour, start_time.minute, start_time.second, study.end_date_time.year, end_time.month,
-              end_time.day, end_time.hour, end_time.minute, end_time.second)
+    json_data = "{" \
+                "\"study\": {" \
+                "\"probandID\": \"%d\"," \
+                "\"studyId\": \"%d\"," \
+                "\"studyName\": \"%s\"," \
+                "\"beginningDate\": {" \
+                "\"year\": %d," \
+                "\"month\": %d," \
+                "\"day\": %d," \
+                "\"hour\": %d," \
+                "\"minute\": %d," \
+                "\"second\": %d," \
+                "}," \
+                "\"endDate\": {" \
+                "\"year\": %d," \
+                "\"month\": %d," \
+                "\"day\": %d," \
+                "\"hour\": %d," \
+                "\"minute\": %d," \
+                "\"second\": %d," \
+                "}," \
+                % (proband.id, study.id, study.name, start_time.year, start_time.month, start_time.day,
+                   start_time.hour, start_time.minute, start_time.second, study.end_date_time.year, end_time.month,
+                   end_time.day, end_time.hour, end_time.minute, end_time.second)
 
     # proband info questionnaire
-    json += "\"probandInfoQuestionnaire\": {"
-    json += _get_question_list_json(
+    json_data += "\"probandInfoQuestionnaire\": {"
+    json_data += _get_question_list_json(
         _get_question_list_from_proband_info_questionnaire(proband_info_questionnaire)
     )
-    json += "},"
+    json_data += "},"
 
     # normal questionnaires
-    json += "\"questionnaires\": ["
+    json_data += "\"questionnaires\": ["
     for questionnaire in questionnaire_list:
         trigger_event = TriggerEvent.objects.get(questionnaire=questionnaire)
         if questionnaire.due_after is None:
@@ -179,14 +179,14 @@ def download(request, study_id):
             duration = questionnaire.due_after.total_seconds()
 
         # basic info of a questionnaire
-        json += "{" \
-                "\"questionnaireID\": \"%d\"," \
-                "\"questionnaireName\": \"%s\"," \
-                "\"maxShowUpTimesPerDay\": %d," \
-                "\"duration\": {" \
-                "\"second\": %d," \
-                "}," \
-                % (questionnaire.id, questionnaire.name, questionnaire.max_trigger_times_per_day, duration)
+        json_data += "{" \
+                     "\"questionnaireID\": \"%d\"," \
+                     "\"questionnaireName\": \"%s\"," \
+                     "\"maxShowUpTimesPerDay\": %d," \
+                     "\"duration\": {" \
+                     "\"second\": %d," \
+                     "}," \
+                     % (questionnaire.id, questionnaire.name, questionnaire.max_trigger_times_per_day, duration)
 
         if trigger_event.datetime is None:
             datetime = "null"
@@ -207,10 +207,10 @@ def download(request, study_id):
             time = "\"%d-%d-%d\"" % (trigger_event.time.hour, trigger_event.time.minute, trigger_event.time.second)
 
         # trigger event of questionnaire
-        json += "\"triggerEvent\": {" \
-                "\"minTimeSpace\": %d," \
-                "\"datetime\": %s," \
-                "\"time\": %s," % (trigger_event.min_time_space.total_seconds(), datetime, time)
+        json_data += "\"triggerEvent\": {" \
+                     "\"minTimeSpace\": %d," \
+                     "\"datetime\": %s," \
+                     "\"time\": %s," % (trigger_event.min_time_space.total_seconds(), datetime, time)
 
         if trigger_event.light is not None:
             if trigger_event.light == "VL":
@@ -231,53 +231,53 @@ def download(request, study_id):
             else:
                 min_light = 0
                 max_light = 40000
-            json += "\"light\": true," \
-                    "\"lightMinValue\": %d," \
-                    "\"lightMaxValue\": %d," % (min_light, max_light)
+            json_data += "\"light\": true," \
+                         "\"lightMinValue\": %d," \
+                         "\"lightMaxValue\": %d," % (min_light, max_light)
         else:
-            json += "\"light\": false,"
+            json_data += "\"light\": false,"
 
         if trigger_event.relative_humidity is not None:
-            json += "\"relativeHumidity\": true," \
-                    "\"relativeHumidityMinValue\": 0," \
-                    "\"relativeHumidityMaxValue\": 0,"
+            json_data += "\"relativeHumidity\": true," \
+                         "\"relativeHumidityMinValue\": 0," \
+                         "\"relativeHumidityMaxValue\": 0,"
         else:
-            json += "\"relativeHumidity\": false,"
+            json_data += "\"relativeHumidity\": false,"
 
         if trigger_event.temperature is not None:
-            json += "\"ambientTemperature\": true," \
-                    "\"ambientTemperatureMinValue\": 0," \
-                    "\"ambientTemperatureMaxValue\": 0,"
+            json_data += "\"ambientTemperature\": true," \
+                         "\"ambientTemperatureMinValue\": 0," \
+                         "\"ambientTemperatureMaxValue\": 0,"
         else:
-            json += "\"ambientTemperature\": false,"
+            json_data += "\"ambientTemperature\": false,"
 
         if trigger_event.air_pressure is not None:
-            json += "\"pressure\": true," \
-                    "\"pressureMinValue\": 0," \
-                    "\"pressureMaxValue\": 0,"
+            json_data += "\"pressure\": true," \
+                         "\"pressureMinValue\": 0," \
+                         "\"pressureMaxValue\": 0,"
         else:
-            json += "\"pressure\": false,"
+            json_data += "\"pressure\": false,"
 
         if trigger_event.proximity is not None:
-            json += "\"proximity\": true," \
-                    "\"proximityMinValue\": 0," \
-                    "\"proximityMaxValue\": 0,"
+            json_data += "\"proximity\": true," \
+                         "\"proximityMinValue\": 0," \
+                         "\"proximityMaxValue\": 0,"
         else:
-            json += "\"proximity\": false,"
-        json += "},"
+            json_data += "\"proximity\": false,"
+        json_data += "},"
 
         # questions of the questionnaire
-        json += _get_question_list_json(
+        json_data += _get_question_list_json(
             _get_question_list_from_questionnaire(questionnaire)
         )
 
-        json += "},"  # end of a questionnaire
+        json_data += "},"  # end of a questionnaire
 
-    json += "]"  # end of all questionnaires
-    json += "}"  # end of study
-    json += "}"  # end of json
+    json_data += "]"  # end of all questionnaires
+    json_data += "}"  # end of study
+    json_data += "}"  # end of json
 
-    return HttpResponse(json, content_type="application/json")
+    return HttpResponse(json_data, content_type="application/json")
 
 
 def preview(request, questionnaire_id):
