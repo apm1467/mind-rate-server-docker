@@ -28,6 +28,8 @@ urlpatterns = [
     # download study to app
     url(r'^download/(?P<study_id>[0-9]+)/$', views.download, name='download'),
 
+    url(r'^proband_info/(?P<study_id>[0-9]+)/$', views.download_proband_info_questionnaire),
+
     # receive answer from app
     url(r'^receive_answer/', views.receive_answer, name='receive_answer'),
 

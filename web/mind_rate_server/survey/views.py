@@ -128,6 +128,16 @@ def _get_question_list_json(question_list):
     return json_data
 
 
+# hard-corded for test
+def download_proband_info_questionnaire(request, study_id):
+    json_data = "{" \
+                "\"birthday\": true," \
+                "\"gender\": false," \
+                "\"occupation\": true" \
+                "}"
+    return HttpResponse(json_data, content_type="application/json")
+
+
 # For app to download studies
 def download(request, study_id):
     study = get_object_or_404(Study, id=study_id)
@@ -191,9 +201,9 @@ def download(request, study_id):
                      % (questionnaire.id, questionnaire.name, questionnaire.max_trigger_times_per_day, duration)
 
         if trigger_event.datetime is None:
-            datetime = "null"
+            date_time = "null"
         else:
-            datetime = "{" \
+            date_time = "{" \
                        "\"year\": %d," \
                        "\"month\": %d," \
                        "\"day\": %d," \
@@ -212,7 +222,7 @@ def download(request, study_id):
         json_data += "\"triggerEvent\": {" \
                      "\"minTimeSpace\": %d," \
                      "\"datetime\": %s," \
-                     "\"time\": %s," % (trigger_event.min_time_space.total_seconds(), datetime, time)
+                     "\"time\": %s," % (trigger_event.min_time_space.total_seconds(), date_time, time)
 
         if trigger_event.light is not None:
             if trigger_event.light == "VL":
