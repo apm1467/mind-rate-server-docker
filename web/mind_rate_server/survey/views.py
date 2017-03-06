@@ -128,13 +128,31 @@ def _get_question_list_json(question_list):
     return json_data
 
 
-# hard-corded for test
+# the small proband info questionnaire showed during proband registration
 def download_proband_info_questionnaire(request, study_id):
+    study = get_object_or_404(Study, id=study_id)
+    proband_info_questionnaire = ProbandInfoQuestionnaire.objects.get(study=study)
+
+    if proband_info_questionnaire.ask_for_birthday:
+        birthday = "true"
+    else:
+        birthday = "false"
+
+    if proband_info_questionnaire.ask_for_gender:
+        gender = "true"
+    else:
+        gender = "false"
+
+    if proband_info_questionnaire.ask_for_occupation:
+        occupation = "true"
+    else:
+        occupation = "false"
+
     json_data = "{" \
-                "\"birthday\": true," \
-                "\"gender\": false," \
-                "\"occupation\": true" \
-                "}"
+                "\"birthday\": %s," \
+                "\"gender\": %s," \
+                "\"occupation\": %s" \
+                "}" % (birthday, gender, occupation)
     return HttpResponse(json_data, content_type="application/json")
 
 

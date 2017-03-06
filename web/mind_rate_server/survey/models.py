@@ -18,6 +18,10 @@ class Study(models.Model):
 class ProbandInfoQuestionnaire(models.Model):
     study = models.OneToOneField(Study, on_delete=models.CASCADE, null=True)
 
+    ask_for_birthday = models.BooleanField(default=False)
+    ask_for_occupation = models.BooleanField(default=False)
+    ask_for_gender = models.BooleanField(default=False)
+
     def __str__(self):
         return "%s's proband info questionnaire" % self.study.name
 

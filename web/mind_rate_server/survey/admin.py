@@ -86,6 +86,7 @@ class QuestionnaireInline(nested_admin.NestedStackedInline):
 
 class ProbandInfoQuestionnaireInline(nested_admin.NestedStackedInline):
     model = ProbandInfoQuestionnaire
+    fields = ['ask_for_birthday', 'ask_for_occupation', 'ask_for_gender']
     inlines = [TextQuestionInline, SingleChoiceQuestionInline, MultiChoiceQuestionInline, DragScaleQuestionInline]
     extra = 0
     max_num = 1
