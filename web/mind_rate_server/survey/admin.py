@@ -1,8 +1,11 @@
 from django.contrib import admin
 import nested_admin
 from .models import Questionnaire, Study, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
-    DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire
+    DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire, QuestionnaireAnswer,\
+    TextQuestionAnswer, SingleChoiceQuestionAnswer, MultiChoiceQuestionAnswer, DragScaleQuestionAnswer
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+import csv
 
 
 class TextQuestionInline(nested_admin.NestedStackedInline):
@@ -88,11 +91,49 @@ class ProbandInfoQuestionnaireInline(nested_admin.NestedStackedInline):
     max_num = 1
 
 
+def export_csv(modeladmin, request, queryset):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="study_data.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Study ID', 'Questionnaire ID', 'Question ID', 'Answer', 'Submit Time'])
+
+    for study in queryset:
+        questionnaire_list = Questionnaire.objects.filter(study=study)
+
+        for questionnaire in questionnaire_list:
+            questionnaire_answer_list = QuestionnaireAnswer.objects.filter(questionnaire=questionnaire)
+
+            for questionnaire_answer in questionnaire_answer_list:
+                question_answer_list = []
+
+                question_answer_list.extend(TextQuestionAnswer.objects.filter(
+                    questionnaire_answer=questionnaire_answer))
+                question_answer_list.extend(SingleChoiceQuestionAnswer.objects.filter(
+                    questionnaire_answer=questionnaire_answer))
+                question_answer_list.extend(MultiChoiceQuestionAnswer.objects.filter(
+                    questionnaire_answer=questionnaire_answer))
+                question_answer_list.extend(DragScaleQuestionAnswer.objects.filter(
+                    questionnaire_answer=questionnaire_answer))
+
+                # sort the question answer list based on submit time
+                question_answer_list.sort(key=lambda item: item.questionnaire_answer.submit_time)
+
+                for question_answer in question_answer_list:
+                    writer.writerow([
+                        study.id, questionnaire.id, question_answer.question.id,
+                        question_answer.value, question_answer.questionnaire_answer.submit_time
+                    ])
+
+    return response
+
+
 class StudyAdmin(nested_admin.NestedModelAdmin):
     model = Study
     fields = ['name', 'start_date_time', 'end_date_time']  # which fields will be asked
     list_display = ('name', 'start_date_time', 'end_date_time')  # fields displayed on the change list page
     inlines = [ProbandInfoQuestionnaireInline, QuestionnaireInline]
+    actions = [export_csv]
 
     # override to attach request.user to the object prior to saving
     def save_model(self, request, obj, form, change):
