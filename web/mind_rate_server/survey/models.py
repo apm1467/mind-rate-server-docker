@@ -23,14 +23,14 @@ class ProbandInfoQuestionnaire(models.Model):
     ask_for_gender = models.BooleanField(default=False)
 
     def __str__(self):
-        return "%s's proband info questionnaire" % self.study.name
+        return self.study.name
 
 
 class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
-    name = models.CharField("Questionnaire name", max_length=30)
+    name = models.CharField("(Optional) Questionnaire name", max_length=30, null=True, blank=True)
     due_after = models.DurationField(
-        "(Optional) Valid time duration after triggered; in [HH:[MM:]]ss format",
+        "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format",
         null=True, blank=True, default="24:00:00")
     max_trigger_times_per_day = models.PositiveIntegerField("Maximal trigger times per day", default=50)
 
@@ -125,7 +125,7 @@ class AbstractQuestion(models.Model):
     position = models.PositiveSmallIntegerField("Position", null=True)  # position on admin site
 
     def __str__(self):
-        return self.question_text
+        return "%s - ID: %d" % (self.question_text, self.id)
 
     class Meta:
         abstract = True

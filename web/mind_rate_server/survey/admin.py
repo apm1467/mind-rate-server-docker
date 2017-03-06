@@ -91,6 +91,7 @@ class ProbandInfoQuestionnaireInline(nested_admin.NestedStackedInline):
     inlines = [TextQuestionInline, SingleChoiceQuestionInline, MultiChoiceQuestionInline, DragScaleQuestionInline]
     extra = 0
     max_num = 1
+    min_num = 1
 
 
 def export_csv(modeladmin, request, queryset):
@@ -144,7 +145,7 @@ def export_csv(modeladmin, request, queryset):
 class StudyAdmin(nested_admin.NestedModelAdmin):
     model = Study
     fields = ['name', 'start_date_time', 'end_date_time']  # which fields will be asked
-    list_display = ('name', 'start_date_time', 'end_date_time')  # fields displayed on the change list page
+    list_display = ('name', 'id', 'start_date_time', 'end_date_time')  # fields displayed on the change list page
     inlines = [ProbandInfoQuestionnaireInline, QuestionnaireInline]
     actions = [export_csv]
 
