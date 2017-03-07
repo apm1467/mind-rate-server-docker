@@ -12,7 +12,7 @@ import csv
 class TextQuestionInline(nested_admin.NestedStackedInline):
     model = TextQuestion
     fields = ['show_by_default', 'question_text', 'position']
-    sortable_field_name = 'position'
+    # sortable_field_name = 'position'
     extra = 0
 
 
@@ -31,7 +31,7 @@ class SingleChoiceQuestionInline(nested_admin.NestedStackedInline):
     model = SingleChoiceQuestion
     fields = ['show_by_default', 'question_text', 'position']
     inlines = [ChoiceOptionInline]
-    sortable_field_name = 'position'
+    # sortable_field_name = 'position'
     sortable_excludes = ('show_by_default', 'question_text', 'position')
     extra = 0
 
@@ -40,7 +40,7 @@ class MultiChoiceQuestionInline(nested_admin.NestedStackedInline):
     model = MultiChoiceQuestion
     fields = ['show_by_default', 'question_text', 'position']
     inlines = [ChoiceOptionInline]
-    sortable_field_name = 'position'
+    # sortable_field_name = 'position'
     sortable_excludes = ('show_by_default', 'question_text', 'position')
     extra = 0
 
@@ -48,7 +48,7 @@ class MultiChoiceQuestionInline(nested_admin.NestedStackedInline):
 class DragScaleQuestionInline(nested_admin.NestedStackedInline):
     model = DragScaleQuestion
     fields = ['show_by_default', 'question_text', 'min_value', 'max_value', 'position']
-    sortable_field_name = 'position'
+    # sortable_field_name = 'position'
     sortable_excludes = ('show_by_default', 'question_text', 'min_value', 'max_value', 'position')
     extra = 0
 
