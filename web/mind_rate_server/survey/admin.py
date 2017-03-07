@@ -92,7 +92,6 @@ class ProbandInfoQuestionnaireInline(nested_admin.NestedStackedInline):
     inlines = [TextQuestionInline, SingleChoiceQuestionInline, MultiChoiceQuestionInline, DragScaleQuestionInline]
     extra = 0
     max_num = 1
-    min_num = 1
 
 
 def export_csv(modeladmin, request, queryset):
