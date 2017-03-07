@@ -29,7 +29,7 @@ class ProbandInfoQuestionnaire(models.Model):
 
 class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
-    name = models.CharField("(Optional) Questionnaire name", max_length=30, default="")
+    name = models.CharField("(Optional) Questionnaire name", max_length=30, default="", null=True, blank=True)
     due_after = models.DurationField(
         "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format",
         null=True, blank=True, default="24:00:00")

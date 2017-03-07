@@ -16,13 +16,14 @@ class TextQuestionInline(nested_admin.NestedStackedInline):
     extra = 0
 
 
-class ChoiceOptionInline(nested_admin.NestedStackedInline):
+class ChoiceOptionInline(nested_admin.NestedTabularInline):
     model = ChoiceOption
     fieldsets = [
         (None, {'fields': ['choice_text']}),
 
         ('(Optional) follow up question for this choice option', {'fields': ['next_question_position']})
     ]
+    min_num = 2
     extra = 0
 
 
