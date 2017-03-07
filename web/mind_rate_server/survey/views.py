@@ -270,30 +270,102 @@ def download(request, study_id):
             json_data += "\"light\": false,"
 
         if trigger_event.relative_humidity is not None:
+            if trigger_event.relative_humidity == "VL":
+                min_humidity = 0
+                max_humidity = 20
+            elif trigger_event.relative_humidity == "L":
+                min_humidity = 0
+                max_humidity = 40
+            elif trigger_event.relative_humidity == "M":
+                min_humidity = 30
+                max_humidity = 70
+            elif trigger_event.relative_humidity == "H":
+                min_humidity = 60
+                max_humidity = 100
+            elif trigger_event.relative_humidity == "VH":
+                min_humidity = 80
+                max_humidity = 100
+            else:
+                min_humidity = 0
+                max_humidity = 100
             json_data += "\"relativeHumidity\": true," \
-                         "\"relativeHumidityMinValue\": 0," \
-                         "\"relativeHumidityMaxValue\": 0,"
+                         "\"relativeHumidityMinValue\": %d," \
+                         "\"relativeHumidityMaxValue\": %d," % (min_humidity, max_humidity)
         else:
             json_data += "\"relativeHumidity\": false,"
 
         if trigger_event.temperature is not None:
+            if trigger_event.temperature == "VL":
+                min_temperature = -50
+                max_temperature = -10
+            elif trigger_event.temperature == "L":
+                min_temperature = -50
+                max_temperature = 10
+            elif trigger_event.temperature == "M":
+                min_temperature = 10
+                max_temperature = 25
+            elif trigger_event.temperature == "H":
+                min_temperature = 25
+                max_temperature = 50
+            elif trigger_event.temperature == "VH":
+                min_temperature = 35
+                max_temperature = 50
+            else:
+                min_temperature = -50
+                max_temperature = 50
             json_data += "\"ambientTemperature\": true," \
-                         "\"ambientTemperatureMinValue\": 0," \
-                         "\"ambientTemperatureMaxValue\": 0,"
+                         "\"ambientTemperatureMinValue\": %d," \
+                         "\"ambientTemperatureMaxValue\": %d," % (min_temperature, max_temperature)
         else:
             json_data += "\"ambientTemperature\": false,"
 
         if trigger_event.air_pressure is not None:
+            if trigger_event.air_pressure == "VL":
+                min_air_pressure = 300
+                max_air_pressure = 600
+            elif trigger_event.air_pressure == "L":
+                min_air_pressure = 300
+                max_air_pressure = 900
+            elif trigger_event.air_pressure == "M":
+                min_air_pressure = 900
+                max_air_pressure = 1100
+            elif trigger_event.air_pressure == "H":
+                min_air_pressure = 1100
+                max_air_pressure = 1300
+            elif trigger_event.air_pressure == "VH":
+                min_air_pressure = 1200
+                max_air_pressure = 1300
+            else:
+                min_air_pressure = 300
+                max_air_pressure = 1100
             json_data += "\"pressure\": true," \
-                         "\"pressureMinValue\": 0," \
-                         "\"pressureMaxValue\": 0,"
+                         "\"pressureMinValue\": %d," \
+                         "\"pressureMaxValue\": %d," % (min_air_pressure, max_air_pressure)
         else:
             json_data += "\"pressure\": false,"
 
         if trigger_event.proximity is not None:
+            if trigger_event.proximity == "VL":
+                min_proximity = 0
+                max_proximity = 1
+            elif trigger_event.proximity == "L":
+                min_proximity = 0
+                max_proximity = 3
+            elif trigger_event.proximity == "M":
+                min_proximity = 3
+                max_proximity = 6
+            elif trigger_event.proximity == "H":
+                min_proximity = 6
+                max_proximity = 10
+            elif trigger_event.proximity == "VH":
+                min_proximity = 8
+                max_proximity = 10
+            else:
+                min_proximity = 0
+                max_proximity = 10
             json_data += "\"proximity\": true," \
-                         "\"proximityMinValue\": 0," \
-                         "\"proximityMaxValue\": 0"
+                         "\"proximityMinValue\": %d," \
+                         "\"proximityMaxValue\": %d" % (min_proximity, max_proximity)
         else:
             json_data += "\"proximity\": false"
         json_data += "},"
