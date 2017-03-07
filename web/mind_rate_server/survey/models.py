@@ -24,12 +24,12 @@ class ProbandInfoQuestionnaire(models.Model):
     ask_for_gender = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.study.name
+        return ""
 
 
 class Questionnaire(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, null=True)
-    name = models.CharField("(Optional) Questionnaire name", max_length=30, null=True, blank=True)
+    name = models.CharField("(Optional) Questionnaire name", max_length=30, default="")
     due_after = models.DurationField(
         "(Optional) Valid time duration after triggered; in [DD] [HH:[MM:]]ss format",
         null=True, blank=True, default="24:00:00")
@@ -111,7 +111,7 @@ class TriggerEvent(models.Model):
                                  max_length=2, choices=SENSOR_LEVEL_CHOICES, null=True, blank=True)
 
     def __str__(self):
-        return "%s's trigger event" % self.questionnaire.name
+        return ""
 
 
 class AbstractQuestion(models.Model):
