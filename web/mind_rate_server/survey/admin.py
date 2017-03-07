@@ -144,8 +144,8 @@ def export_csv(modeladmin, request, queryset):
 
 class StudyAdmin(nested_admin.NestedModelAdmin):
     model = Study
-    fields = ['name', 'start_date_time', 'end_date_time']  # which fields will be asked
-    list_display = ('name', 'id', 'start_date_time', 'end_date_time')  # fields displayed on the change list page
+    fields = ['name', 'start_date_time', 'end_date_time']
+    list_display = ('name', 'id', 'start_date_time', 'end_date_time', 'answer_updated_times')
     inlines = [ProbandInfoQuestionnaireInline, QuestionnaireInline]
     actions = [export_csv]
 

@@ -7,6 +7,7 @@ class Study(models.Model):
     name = models.CharField("Study name", max_length=30)
     start_date_time = models.DateTimeField("Start time")
     end_date_time = models.DateTimeField("End time")
+    answer_updated_times = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return "%s - ID: %d" % (self.name, self.id)

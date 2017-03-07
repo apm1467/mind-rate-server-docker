@@ -360,6 +360,7 @@ def receive_answer(request):
                 MultiChoiceQuestionAnswer.objects.create(question=question, value=question_item['answer'],
                                                          questionnaire_answer=questionnaire_answer)
 
+    proband.study.answer_updated_times += 1  # update received answers counter
     return HttpResponse("OK")
 
 
