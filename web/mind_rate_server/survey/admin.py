@@ -100,7 +100,7 @@ def export_csv(modeladmin, request, queryset):
     response['Content-Disposition'] = 'attachment; filename="study_data.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Study ID', 'Questionnaire ID', 'Question ID', 'Answer', 'Submit Time', 'Sensor value'])
+    writer.writerow(['Study ID', 'Questionnaire ID', 'Question', 'Answer', 'Submit Time', 'Sensor value'])
 
     for study in queryset:
         questionnaire_list = Questionnaire.objects.filter(study=study)
@@ -135,7 +135,7 @@ def export_csv(modeladmin, request, queryset):
                 # write all values into a csv row
                 for question_answer in question_answer_list:
                     writer.writerow([
-                        study.id, questionnaire.id, question_answer.question.id,
+                        study.id, questionnaire.id, question_answer.question.question_text,
                         question_answer.value, question_answer.questionnaire_answer.submit_time,
                         sensor_value
                     ])

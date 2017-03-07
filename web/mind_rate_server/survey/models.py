@@ -126,7 +126,7 @@ class AbstractQuestion(models.Model):
     position = models.PositiveSmallIntegerField("Position", null=True)  # position on admin site
 
     def __str__(self):
-        return "%s - ID: %d" % (self.question_text, self.id)
+        return self.question_text
 
     class Meta:
         abstract = True
