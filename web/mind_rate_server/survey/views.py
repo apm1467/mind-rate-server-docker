@@ -388,7 +388,7 @@ def download(request, study_id):
 def receive_answer(request):
     # write received request to log
     now = datetime.datetime.now().strftime('%m %d %H:%M:%S')
-    log = open('log.txt', 'a')
+    log = open('/usr/src/app/log.txt', 'a')
     log.write('\n\n%s\n%s' % (now, request.body))
 
     json_data = json.loads(request.body)
@@ -442,7 +442,7 @@ def receive_answer(request):
 
 
 def view_log(request):
-    log = open('log.txt', 'r')
+    log = open('/usr/src/app/log.txt', 'r')
     return HttpResponse(log.read())
 
 
