@@ -23,7 +23,7 @@ urlpatterns = [
 
     url(r'^accounts/', include('registration.backends.hmac.urls')),
 
-    url(r'^study/(?P<study_id>\d+)/$', views.view_answers, name='view_answers'),
+    #url(r'^study/(?P<study_id>\d+)/$', views.view_answers, name='view_answers'),
 
     # download study to app
     url(r'^download/(?P<study_id>[0-9]+)/$', views.download, name='download'),
