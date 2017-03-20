@@ -1,3 +1,4 @@
+python3 web/manage.py collectstatic
 python3 web/manage.py makemigrations survey
 python3 web/manage.py migrate
 sudo docker-compose down
