@@ -386,6 +386,11 @@ def download(request, study_id):
 
 
 def receive_answer(request):
+    # write received request to log
+    now = datetime.datetime.now().strftime('%m %d %H:%M:%S')
+    log = open('log.txt', 'a')
+    log.write('\n\n%s\n%s' % (now, request.body))
+
     json_data = json.loads(request.body)
 
     proband = get_object_or_404(Proband, id=json_data['probandID'])
@@ -434,6 +439,11 @@ def receive_answer(request):
 
     proband.study.answer_updated_times += 1  # update received answers counter
     return HttpResponse("OK")
+
+
+def view_log(request):
+    log = open('log.txt', 'r')
+    return HttpResponse(log.read())
 
 
 def preview(request, questionnaire_id):
