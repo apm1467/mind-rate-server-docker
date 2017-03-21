@@ -60,6 +60,9 @@ def _get_question_list_from_proband_info_questionnaire(proband_info_questionnair
 
 
 def _get_question_list_json(question_list):
+    if len(question_list) == 0:
+        return "\"questions\": []"
+
     json_data = "\"questions\": ["
 
     for question in question_list:
