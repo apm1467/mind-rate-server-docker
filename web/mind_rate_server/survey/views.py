@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
 
@@ -388,6 +389,7 @@ def download(request, study_id):
     return HttpResponse(json_data, content_type="application/json")
 
 
+@csrf_exempt
 def receive_answer(request):
     # write received request to log
     now = datetime.datetime.now().strftime('%m %d %H:%M:%S')
