@@ -443,12 +443,12 @@ def receive_answer(request):
                                                          questionnaire_answer=questionnaire_answer)
 
     proband.study.answer_updated_times += 1  # update received answers counter
-    return HttpResponse("OK")
+    return HttpResponse("OK", content_type="text/plain")
 
 
 def view_log(request):
     log = open('/usr/src/app/log.txt', 'r')
-    return HttpResponse(log.read())
+    return HttpResponse(log.read(), content_type="text/plain")
 
 
 def preview(request, questionnaire_id):
