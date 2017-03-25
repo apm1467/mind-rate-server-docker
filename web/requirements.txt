@@ -3,3 +3,4 @@ gunicorn==19.6.0
 django-registration
 django-nested-admin
 django-grappelli
+django-password-reset

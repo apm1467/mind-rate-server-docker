@@ -38,4 +38,7 @@ urlpatterns = [
     url(r'^preview/(?P<questionnaire_id>\d+)/$', views.preview, name='preview'),
 
     url(r'^_nested_admin/', include('nested_admin.urls')),
+
+    url(r'', include('password_reset.urls')),
+
 ]

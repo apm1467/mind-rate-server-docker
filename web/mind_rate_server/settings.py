@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'mind_rate_server.survey',
-    'nested_admin'
+    'nested_admin',
+    'password_reset'
 ]
 
 MIDDLEWARE = [
