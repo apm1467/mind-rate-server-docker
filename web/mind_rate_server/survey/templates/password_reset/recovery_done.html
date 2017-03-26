@@ -1,0 +1,18 @@
+{% extends 'password_reset/_base_password_reset.html' %}
+
+
+{% block password_reset_content %}
+
+    <div class="panel-heading">
+        <h3 class="panel-title">New Password Set</h3>
+    </div>
+
+    <div class="panel-body">
+
+        <p>Your password has successfully been reset.</p>
+
+        <p>You can now <a href="{% url 'login' %}">log in</a>.</p>
+
+    </div>
+
+{% endblock %}

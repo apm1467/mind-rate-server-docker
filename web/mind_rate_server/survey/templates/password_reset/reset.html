@@ -1,0 +1,49 @@
+{% extends 'password_reset/_base_password_reset.html' %}
+
+
+{% block password_reset_content %}
+
+    <div class="panel-heading">
+        <h3 class="panel-title">New Password Set</h3>
+    </div>
+
+    <div class="panel-body">
+
+        {% if invalid %}{% url "password_reset_recover" as recovery_url %}
+
+            <p>This password reset link is invalid.</p>
+
+        {% else %}
+
+            <p>Hi, <strong>{{ username }}</strong>. Please choose your new password.</p>
+
+            <form method="post" action="{% url "password_reset_reset" token %}">
+                {% csrf_token %}
+
+                <p class="bs-component">
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <span style="float: right;">{{ form.password1 }}</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password confirmation:</label>
+                        <span style="float: right;">{{ form.password2 }}</span>
+                    </div>
+                </p>
+
+                <p class="bs-component text-center">
+                    <input class="btn btn-success" type="submit" value="Set new password" />
+                </p>
+            </form>
+
+            {% if form.errors %}
+                <h4>Form Error</h4>
+                <p>The two passwords didn't match.</p>
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}
