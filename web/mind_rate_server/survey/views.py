@@ -233,7 +233,7 @@ def download(request, study_id):
                        "\"day\": %d," \
                        "\"hour\": %d," \
                        "\"minute\": %d," \
-                       "\"second\": %d," \
+                       "\"second\": %d" \
                        "}" \
                        % (trigger_event.datetime.year, trigger_event.datetime.month, trigger_event.datetime.day,
                           trigger_event.datetime.hour, trigger_event.datetime.minute, trigger_event.datetime.second)
