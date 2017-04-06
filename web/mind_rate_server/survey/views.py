@@ -30,12 +30,6 @@ def home(request):
     return redirect('/admin/')
 
 
-def view_answers(request, study_id):
-    study = get_object_or_404(Study, pk=study_id)
-    user = request.user
-    return render(request, 'view_answers.html', {"study": study, "user": user})
-
-
 def _get_question_list_from_questionnaire(questionnaire):
     question_list = []
 
@@ -134,7 +128,7 @@ def _get_question_list_json(question_list):
     return json_data
 
 
-# the small proband info questionnaire showed during proband registration
+# the 3 standard proband info questions showed during proband registration
 def download_proband_info_questionnaire(request, study_id):
     study = get_object_or_404(Study, id=study_id)
     proband_info_questionnaire = ProbandInfoQuestionnaire.objects.get(study=study)
