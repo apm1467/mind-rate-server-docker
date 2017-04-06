@@ -72,7 +72,7 @@ class TriggerEventInline(nested_admin.NestedStackedInline):
     ]
     list_display = ('name', 'due_after', 'max_trigger_times_per_day')
     extra = 0
-    min_num = 1
+    min_num = 0
     max_num = 1
 
 
