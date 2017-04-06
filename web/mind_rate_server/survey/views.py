@@ -397,34 +397,52 @@ def receive_answer(request):
     log.write('\n\n%s\n%s' % (now, request.body))
 
     json_data = json.loads(request.body)
-
     proband = get_object_or_404(Proband, id=json_data['probandID'])
 
-    # store proband info
-    for key, value in json_data['probandInfoAnswer'].items():
-        ProbandInfoCell.objects.create(proband=proband, key=key, value=value)
+    if 'questionnaireID' not in json_data:  # the 3 standard proband info questions
+        # store proband info
+        if 'birthday' in json_data:
+            ProbandInfoCell.objects.create(proband=proband, key='birthday', value=json_data['birthday'])
+        if 'gender' in json_data:
+            ProbandInfoCell.objects.create(proband=proband, key='gender', value=json_data['gender'])
+        if 'occupation' in json_data:
+            ProbandInfoCell.objects.create(proband=proband, key='occupation', value=json_data['occupation'])
 
-    # store questionnaire answer
-    for questionnaire_item in json_data['questionnaireAnswerList']:
-        questionnaire = get_object_or_404(Questionnaire, id=questionnaire_item['questionnaireID'])
-        
-        submit_time_dict = questionnaire_item['submitTime']
+    elif json_data['questionnaireID'] == 'probandInfoQuestionnaire':  # custom proband info questions
+        for question_item in json_data['questionAnswer']:
+
+            # get the question object
+            question_type = question_item['questionType']
+            if question_type == 'SingleChoice':
+                question = get_object_or_404(SingleChoiceQuestion, id=question_item['questionID'])
+            elif question_type == 'TextAnswer':
+                question = get_object_or_404(TextQuestion, id=question_item['questionID'])
+            elif question_type == 'DragScale':
+                question = get_object_or_404(DragScaleQuestion, id=question_item['questionID'])
+            elif question_type == 'MultipleChoice':
+                question = get_object_or_404(MultiChoiceQuestion, id=question_item['questionID'])
+
+            # store proband info
+            ProbandInfoCell.objects.create(proband=proband, key=question.question_text, value=question_item['answer'])
+
+    else:  # normal questionnaire
+        questionnaire = get_object_or_404(Questionnaire, id=json_data['questionnaireID'])
+        submit_time_dict = json_data['submitTime']
         submit_time = datetime.datetime(submit_time_dict['year'], submit_time_dict['month'],
                                         submit_time_dict['day'], submit_time_dict['hour'],
                                         submit_time_dict['minute'], submit_time_dict['second'])
-        
+
+        # create questionnaire answer object
         questionnaire_answer = QuestionnaireAnswer.objects.create(questionnaire=questionnaire, submitter=proband,
                                                                   submit_time=submit_time)
-        
+
         # store sensor values of the questionnaire answer
-        for key, value in questionnaire_item['sensorValues']:
+        for key, value in json_data['sensorValues']:
             SensorValueCell.objects.create(questionnaire_answer=questionnaire_answer, key=key, value=value)
 
         # store answers of each question
-        for question_item in questionnaire_item['questionAnswer']:
-
+        for question_item in json_data['questionAnswer']:
             question_type = question_item['questionType']
-
             if question_type == 'SingleChoice':
                 question = get_object_or_404(SingleChoiceQuestion, id=question_item['questionID'])
                 SingleChoiceQuestionAnswer.objects.create(question=question, value=question_item['answer'],
