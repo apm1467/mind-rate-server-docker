@@ -207,8 +207,8 @@ def preview_questions(modeladmin, request, queryset):
                         if option.next_question_position is None:
                             question_options += "<li>" + option.choice_text + "</li>"
                         else:
-                            question_options += "<li>" + option.choice_text + "  <b>→</b>  Question " + \
-                                                str(option.next_question_position) + "</li>"
+                            question_options += "<li>" + option.choice_text + " → <b>Question " + \
+                                                str(option.next_question_position) + "</b></li>"
                     question_options += "</ol>"
 
                 elif isinstance(question, MultiChoiceQuestion):
@@ -224,8 +224,13 @@ def preview_questions(modeladmin, request, queryset):
                 elif isinstance(question, TextQuestion):
                     question_options = "Text question"
 
+                if question.show_by_default:
+                    visibility = "Show by default"
+                else:
+                    visibility = "Not show by default"
+
                 question_dict = {"position": question.position, "text": question.question_text,
-                                 "options": question_options}
+                                 "options": question_options, "visibility": visibility}
                 study_list[-1]["questionnaires"][-1]["questions"].append(question_dict)
 
     return render(request, 'preview.html', {"study_list": study_list})

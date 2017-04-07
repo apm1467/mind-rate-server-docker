@@ -18,7 +18,9 @@
                         <ul class="list-group">
                             {% for question in questionnaire.questions %}
                                 <dl class="list-group-item">
-                                    <dt class="list-group-item-heading">{{ question.position }}. {{ question.text }}</dt>
+                                    <dt class="list-group-item-heading">
+                                        {{ question.position }}. {{ question.text }} <small>{{ question.visibility }}</small>
+                                    </dt>
 
                                     <dd class="list-group-item-text">{{ question.options|safe }}</dd>
                                 </dl>
