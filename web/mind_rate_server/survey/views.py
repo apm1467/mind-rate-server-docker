@@ -391,7 +391,7 @@ def receive_answer(request):
     log.write('\n\n%s\n%s' % (now, request.body))
 
     json_data = json.loads(request.body.replace(b'\\n', b''))
-    proband = get_object_or_404(Proband, id=json_data['probandID'])
+    proband = Proband.objects.get(id=json_data['probandID'])
 
     if 'questionnaireID' not in json_data:  # the 3 standard proband info questions
         # store proband info
@@ -408,19 +408,19 @@ def receive_answer(request):
             # get the question object
             question_type = question_item['questionType']
             if question_type == 'SingleChoice':
-                question = get_object_or_404(SingleChoiceQuestion, id=question_item['questionID'])
+                question = SingleChoiceQuestion.objects.get(id=question_item['questionID'])
             elif question_type == 'TextAnswer':
-                question = get_object_or_404(TextQuestion, id=question_item['questionID'])
+                question = TextQuestion.objects.get(id=question_item['questionID'])
             elif question_type == 'DragScale':
-                question = get_object_or_404(DragScaleQuestion, id=question_item['questionID'])
-            elif question_type == 'MultipleChoice':
-                question = get_object_or_404(MultiChoiceQuestion, id=question_item['questionID'])
+                question = DragScaleQuestion.objects.get(id=question_item['questionID'])
+            else:
+                question = MultiChoiceQuestion.objects.get(id=question_item['questionID'])
 
             # store proband info
             ProbandInfoCell.objects.create(proband=proband, key=question.question_text, value=question_item['answer'])
 
     else:  # normal questionnaire
-        questionnaire = get_object_or_404(Questionnaire, id=json_data['questionnaireID'])
+        questionnaire = Questionnaire.objects.get(id=json_data['questionnaireID'])
         submit_time_dict = json_data['submitTime']
         submit_time = datetime.datetime(submit_time_dict['year'], submit_time_dict['month'],
                                         submit_time_dict['day'], submit_time_dict['hour'],
@@ -438,19 +438,19 @@ def receive_answer(request):
         for question_item in json_data['questionAnswer']:
             question_type = question_item['questionType']
             if question_type == 'SingleChoice':
-                question = get_object_or_404(SingleChoiceQuestion, id=question_item['questionID'])
+                question = SingleChoiceQuestion.objects.get(id=question_item['questionID'])
                 SingleChoiceQuestionAnswer.objects.create(question=question, value=question_item['answer'],
                                                           questionnaire_answer=questionnaire_answer)
             elif question_type == 'TextAnswer':
-                question = get_object_or_404(TextQuestion, id=question_item['questionID'])
+                question = TextQuestion.objects.get(id=question_item['questionID'])
                 TextQuestionAnswer.objects.create(question=question, value=question_item['answer'],
                                                   questionnaire_answer=questionnaire_answer)
             elif question_type == 'DragScale':
-                question = get_object_or_404(DragScaleQuestion, id=question_item['questionID'])
+                question = DragScaleQuestion.objects.get(id=question_item['questionID'])
                 DragScaleQuestionAnswer.objects.create(question=question, value=question_item['answer'],
                                                        questionnaire_answer=questionnaire_answer)
             elif question_type == 'MultipleChoice':
-                question = get_object_or_404(MultiChoiceQuestion, id=question_item['questionID'])
+                question = MultiChoiceQuestion.objects.get(id=question_item['questionID'])
                 MultiChoiceQuestionAnswer.objects.create(question=question, value=question_item['answer'],
                                                          questionnaire_answer=questionnaire_answer)
 
