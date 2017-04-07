@@ -1,7 +1,7 @@
 from .models import Questionnaire, Study, Proband, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
     DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire, ProbandInfoCell, QuestionnaireAnswer, \
     SensorValueCell, TextQuestionAnswer, SingleChoiceQuestionAnswer, MultiChoiceQuestionAnswer, DragScaleQuestionAnswer
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
