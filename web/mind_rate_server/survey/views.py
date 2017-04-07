@@ -455,6 +455,7 @@ def receive_answer(request):
                                                          questionnaire_answer=questionnaire_answer)
 
     proband.study.answer_updated_times += 1  # update received answers counter
+    proband.save()
     return HttpResponse("OK", content_type="text/plain")
 
 
