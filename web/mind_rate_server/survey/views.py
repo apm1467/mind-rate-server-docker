@@ -423,9 +423,9 @@ def receive_answer(request):
     else:  # normal questionnaire
         questionnaire = Questionnaire.objects.get(id=json_data['questionnaireID'])
         submit_time_dict = json_data['submitTime']
-        submit_time = datetime.datetime(submit_time_dict['year'], submit_time_dict['month'],
-                                        submit_time_dict['day'], submit_time_dict['hour'],
-                                        submit_time_dict['minute'], submit_time_dict['second'])
+        submit_time = datetime.datetime(int(submit_time_dict['year']), int(submit_time_dict['month']),
+                                        int(submit_time_dict['day']), int(submit_time_dict['hour']),
+                                        int(submit_time_dict['minute']), int(submit_time_dict['second']))
 
         # create questionnaire answer object
         questionnaire_answer = QuestionnaireAnswer.objects.create(questionnaire=questionnaire, submitter=proband,
