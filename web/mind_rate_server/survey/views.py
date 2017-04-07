@@ -392,6 +392,7 @@ def receive_answer(request):
 
     json_data = json.loads(request.body.replace(b'\\n', b''))
     proband = Proband.objects.get(id=json_data['probandID'])
+    study = proband.study
 
     if 'questionnaireID' not in json_data:  # the 3 standard proband info questions
         # store proband info
@@ -454,8 +455,8 @@ def receive_answer(request):
                 MultiChoiceQuestionAnswer.objects.create(question=question, value=question_item['answer'],
                                                          questionnaire_answer=questionnaire_answer)
 
-    proband.study.answer_updated_times += 1  # update received answers counter
-    proband.save()
+    study.answer_updated_times += 1  # update received answers counter
+    study.save()
     return HttpResponse("OK", content_type="text/plain")
 
 
