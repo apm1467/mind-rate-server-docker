@@ -3,7 +3,7 @@ import nested_admin
 from .models import Questionnaire, Study, TextQuestion, SingleChoiceQuestion, MultiChoiceQuestion,\
     DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire, QuestionnaireAnswer,\
     TextQuestionAnswer, SingleChoiceQuestionAnswer, MultiChoiceQuestionAnswer, DragScaleQuestionAnswer,\
-    SensorValueCell
+    SensorValueCell, Proband, ProbandInfoCell
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 import csv
@@ -94,12 +94,52 @@ class ProbandInfoQuestionnaireInline(nested_admin.NestedStackedInline):
     max_num = 1
 
 
-def export_csv(modeladmin, request, queryset):
+def export_proband_info(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="study_data.csv"'
+    response['Content-Disposition'] = 'attachment; filename="proband_info.csv"'
+
+    for study in queryset:
+        proband_list = Proband.objects.filter(study=study)
+
+        # get all proband info cell keys
+        proband_info_keys = set()
+        for proband in proband_list:
+            proband_info_cell_list = ProbandInfoCell.objects.filter(proband=proband)
+            for proband_info_cell in proband_info_cell_list:
+                proband_info_keys.add(proband_info_cell.key)
+        proband_info_keys = list(proband_info_keys)  # convert to list because set is unordered
+
+        # write title line
+        writer = csv.writer(response)
+        writer.writerow(['Study ID', 'Proband ID'] + proband_info_keys)
+
+        for proband in proband_list:
+            proband_info_cell_list = ProbandInfoCell.objects.filter(proband=proband)
+            # skip all probands without valid proband info
+            if not proband_info_cell_list:
+                continue
+
+            info_list = []
+            for key in proband_info_keys:
+                if not ProbandInfoCell.objects.filter(key=key):
+                    info_list.append('')
+                else:
+                    info_list.append(ProbandInfoCell.objects.filter(key=key).last().value)
+
+            # write info line for each proband
+            writer.writerow([study.id, proband.id] + info_list)
+
+        writer.writerow([''])  # an empty line for each study
+
+    return response
+
+
+def export_study_answer(modeladmin, request, queryset):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="study_answer.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Study ID', 'Questionnaire ID', 'Question', 'Answer', 'Submit Time', 'Sensor value'])
+    writer.writerow(['Study ID', 'Questionnaire ID', 'Question', 'Answer', 'Proband ID', 'Submit Time', 'Sensor value'])
 
     for study in queryset:
         questionnaire_list = Questionnaire.objects.filter(study=study)
@@ -111,13 +151,12 @@ def export_csv(modeladmin, request, queryset):
 
                 # write all sensor values into a string
                 sensor_value = ""
-
                 sensor_value_cell_list = SensorValueCell.objects.filter(questionnaire_answer=questionnaire_answer)
                 for sensor_value_cell in sensor_value_cell_list:
                     sensor_value += "%s: %s / " % (sensor_value_cell.key, sensor_value_cell.value)
                     sensor_value = sensor_value[:-3]  # remove the trailing slash
 
-                # add all question answers of the questionnaire answer into a list
+                # make a list of all question answers
                 question_answer_list = []
                 question_answer_list.extend(TextQuestionAnswer.objects.filter(
                     questionnaire_answer=questionnaire_answer))
@@ -135,9 +174,11 @@ def export_csv(modeladmin, request, queryset):
                 for question_answer in question_answer_list:
                     writer.writerow([
                         study.id, questionnaire.id, question_answer.question.question_text,
-                        question_answer.value, question_answer.questionnaire_answer.submit_time,
-                        sensor_value
+                        question_answer.value, question_answer.questionnaire_answer.submitter.id,
+                        question_answer.questionnaire_answer.submit_time, sensor_value
                     ])
+
+        writer.writerow([''])  # an empty line for each study
 
     return response
 
@@ -147,7 +188,7 @@ class StudyAdmin(nested_admin.NestedModelAdmin):
     fields = ['name', 'start_date_time', 'end_date_time']
     list_display = ('name', 'id', 'start_date_time', 'end_date_time', 'answer_updated_times')
     inlines = [ProbandInfoQuestionnaireInline, QuestionnaireInline]
-    actions = [export_csv]
+    actions = [export_proband_info, export_study_answer]
 
     # override to attach request.user to the object prior to saving
     def save_model(self, request, obj, form, change):
