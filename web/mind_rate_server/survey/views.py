@@ -432,7 +432,7 @@ def receive_answer(request):
                                                                   submit_time=submit_time)
 
         # store sensor values of the questionnaire answer
-        for key, value in json_data['sensorValues']:
+        for key, value in json_data['sensorValues'].items():
             SensorValueCell.objects.create(questionnaire_answer=questionnaire_answer, key=key, value=value)
 
         # store answers of each question
