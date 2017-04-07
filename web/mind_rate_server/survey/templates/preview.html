@@ -2,40 +2,36 @@
 
 {% block content %}
 
-<style>
-  .bottom-space {
-     margin-bottom: 1cm;
-  }
-</style>
+<div class="container">
 
-<h1>Preview</h1>
-<h2>Questionnaire {{ questionnaire.pk }}: {{ questionnaire.questionnaire_name }}</h2>
+    <h2>Preview</h2>
 
-<div style="background-color:#E6E6E6;color:black;padding:20px;">
-  <ul style="list-style-type:none">
-    {% for question in question_list %}
-    <p class="bottom-space">
-        <li><b>Question {{ question.position }}: {{ question.question_text }} </b>(Show by Default: {{ question.show_by_default }})</li>
 
-        <ul style="list-style-type:disc">
+        {% for study in study_list %}
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3>Study — {{ study.name }}</h3></div>
 
-        {% if question in questionnaire.textquestion_set.all %}
+                <div class="panel-body">
+                    {% for questionnaire in study.questionnaires %}
+                        <h4>Questionnaire {{ questionnaire.id }}</h4>
 
-        {% elif question in questionnaire.dragscalequestion_set.all %}
-            <p>Minimum: {{ question.min_value }} - Maximum: {{ question.max_value }}</p>
+                        <ul class="list-group">
+                            {% for question in questionnaire.questions %}
+                                <dl class="list-group-item">
+                                    <dt class="list-group-item-heading">{{ question.position }}. {{ question.text }}</dt>
 
-        {% else %}
-        {# single or multi choice question #}
-            <p>{% for choice in question.choiceoption_set.all %}
-            <li>{{ choice.choice_text }}
-              {% if choice.next_question_position %}(Follow up question: {{choice.next_question_position}}){% endif %}
-            </li>
-            {% endfor %}</p>
-        {% endif %}
-        </ul>
-    </p>
-    {% endfor %}
-  </ul>
+                                    <dd class="list-group-item-text">{{ question.options|safe }}</dd>
+                                </dl>
+                            {% endfor %}
+                        </ul>
+
+                    {% endfor %}
+                </div>
+
+            </div>
+        {% endfor %}
+
+
 </div>
 
 {% endblock %}

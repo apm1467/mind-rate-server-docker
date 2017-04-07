@@ -463,9 +463,3 @@ def receive_answer(request):
 def view_log(request):
     log = open('/usr/src/app/log.txt', 'r')
     return HttpResponse(log.read(), content_type="text/plain")
-
-
-def preview(request, questionnaire_id):
-    questionnaire = get_object_or_404(Questionnaire, pk=questionnaire_id)
-    all_question_list = _get_question_list_from_questionnaire(questionnaire)
-    return render(request, 'preview.html', {"questionnaire": questionnaire, "question_list": all_question_list})

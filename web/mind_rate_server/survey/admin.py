@@ -4,8 +4,10 @@ from .models import Questionnaire, Study, TextQuestion, SingleChoiceQuestion, Mu
     DragScaleQuestion, TriggerEvent, ChoiceOption, ProbandInfoQuestionnaire, QuestionnaireAnswer,\
     TextQuestionAnswer, SingleChoiceQuestionAnswer, MultiChoiceQuestionAnswer, DragScaleQuestionAnswer,\
     SensorValueCell, Proband, ProbandInfoCell
+from .views import _get_question_list_from_questionnaire
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from django.shortcuts import render
 import csv
 
 
@@ -183,12 +185,58 @@ def export_study_answer(modeladmin, request, queryset):
     return response
 
 
+def preview_questions(modeladmin, request, queryset):
+    study_list = []
+    for study in queryset:
+        study_dict = {"name": study.name, "questionnaires": []}
+        study_list.append(study_dict)
+
+        questionnaire_list = Questionnaire.objects.filter(study=study)
+        for questionnaire in questionnaire_list:
+            questionnaire_dict = {"id": questionnaire.id, "questions": []}
+            study_list[-1]["questionnaires"].append(questionnaire_dict)
+
+            question_list = _get_question_list_from_questionnaire(questionnaire)
+            for question in question_list:
+                question_options = ""
+
+                if isinstance(question, SingleChoiceQuestion):
+                    question_options += "<ol>"
+                    option_list = ChoiceOption.objects.filter(single_choice_question=question)
+                    for option in option_list:
+                        if option.next_question_position is None:
+                            question_options += "<li>" + option.choice_text + "</li>"
+                        else:
+                            question_options += "<li>" + option.choice_text + "  <b>→</b>  Question " + \
+                                                str(option.next_question_position) + "</li>"
+                    question_options += "</ol>"
+
+                elif isinstance(question, MultiChoiceQuestion):
+                    question_options += "<ol>"
+                    option_list = ChoiceOption.objects.filter(multi_choice_question=question)
+                    for option in option_list:
+                        question_options += "<li>" + option.choice_text + "</li>"
+                    question_options += "</ol>"
+
+                elif isinstance(question, DragScaleQuestion):
+                    question_options = "Range: %d – %d" % (question.min_value, question.max_value)
+
+                elif isinstance(question, TextQuestion):
+                    question_options = "Text question"
+
+                question_dict = {"position": question.position, "text": question.question_text,
+                                 "options": question_options}
+                study_list[-1]["questionnaires"][-1]["questions"].append(question_dict)
+
+    return render(request, 'preview.html', {"study_list": study_list})
+
+
 class StudyAdmin(nested_admin.NestedModelAdmin):
     model = Study
     fields = ['name', 'start_date_time', 'end_date_time']
     list_display = ('name', 'id', 'start_date_time', 'end_date_time', 'answer_updated_times')
     inlines = [ProbandInfoQuestionnaireInline, QuestionnaireInline]
-    actions = [export_proband_info, export_study_answer]
+    actions = [preview_questions, export_proband_info, export_study_answer]
 
     # override to attach request.user to the object prior to saving
     def save_model(self, request, obj, form, change):
