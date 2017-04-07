@@ -121,10 +121,10 @@ def export_proband_info(modeladmin, request, queryset):
 
             info_list = []
             for key in proband_info_keys:
-                if not ProbandInfoCell.objects.filter(key=key):
-                    info_list.append('')
+                if not ProbandInfoCell.objects.filter(proband=proband, key=key):
+                    info_list.append(' ')
                 else:
-                    info_list.append(ProbandInfoCell.objects.filter(key=key).last().value)
+                    info_list.append(ProbandInfoCell.objects.filter(proband=proband, key=key).last().value)
 
             # write info line for each proband
             writer.writerow([study.id, proband.id] + info_list)
