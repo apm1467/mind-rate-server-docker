@@ -390,7 +390,7 @@ def receive_answer(request):
     log = open('/usr/src/app/log.txt', 'a')
     log.write('\n\n%s\n%s' % (now, request.body))
 
-    json_data = json.loads(request.body.replace('\\n', ''))
+    json_data = json.loads(request.body.replace(b'\\n', b''))
     proband = get_object_or_404(Proband, id=json_data['probandID'])
 
     if 'questionnaireID' not in json_data:  # the 3 standard proband info questions
